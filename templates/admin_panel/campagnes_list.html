@@ -1,0 +1,20 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Campagnes Email{% endblock %}{% block content %}
+<div class="d-flex justify-content-end mb-3"><a href="{% url 'admin_campagne_create' %}" class="btn btn-primary"><i class="bi bi-plus"></i> Nouvelle campagne</a></div>
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr><th>Nom</th><th>Sujet</th><th>Destinataires</th><th>Envoyes</th><th>Statut</th><th>Date</th><th></th></tr></thead>
+<tbody>
+{% for c in campagnes %}
+<tr>
+<td><strong>{{ c.nom }}</strong></td>
+<td>{{ c.sujet }}</td>
+<td>{{ c.nb_destinataires }}</td>
+<td>{{ c.nb_envoyes }}</td>
+<td><span class="badge bg-{% if c.statut == 'ENVOYEE' %}success{% elif c.statut == 'BROUILLON' %}secondary{% else %}warning{% endif %}">{{ c.get_statut_display }}</span></td>
+<td>{{ c.created_at|date:"d/m/Y" }}</td>
+<td><a href="{% url 'admin_campagne_detail' c.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+</tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucune campagne</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+{% endblock %}

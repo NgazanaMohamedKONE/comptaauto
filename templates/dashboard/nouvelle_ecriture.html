@@ -1,0 +1,16 @@
+{% extends 'base.html' %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area"><h3 style="font-family:'Playfair Display',serif;">Nouvelle ecriture comptable</h3>
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+<div class="card"><div class="card-body">
+{% if not comptes %}<div class="alert alert-warning">Vous devez d'abord <a href="{% url 'init_plan' %}">initialiser le plan comptable</a>.</div>
+{% else %}<form method="POST">{% csrf_token %}<div class="row">
+<div class="col-md-6 mb-3"><label>Date</label><input type="date" name="date_ecriture" class="form-control" value="{{ today|date:'Y-m-d' }}" required></div>
+<div class="col-md-6 mb-3"><label>Numero piece</label><input type="text" name="numero_piece" class="form-control" placeholder="F2026-001"></div>
+<div class="col-12 mb-3"><label>Libelle</label><input type="text" name="libelle" class="form-control" placeholder="Achat fournitures bureau" required></div>
+<div class="col-md-4 mb-3"><label>Compte debit</label><select name="compte_debit" class="form-select" required>{% for c in comptes %}<option value="{{ c.id }}">{{ c.numero }} - {{ c.libelle }}</option>{% endfor %}</select></div>
+<div class="col-md-4 mb-3"><label>Compte credit</label><select name="compte_credit" class="form-select" required>{% for c in comptes %}<option value="{{ c.id }}">{{ c.numero }} - {{ c.libelle }}</option>{% endfor %}</select></div>
+<div class="col-md-4 mb-3"><label>Montant (FCFA)</label><input type="number" step="0.01" name="montant" class="form-control" required></div>
+</div><button type="submit" class="btn btn-connect"><i class="bi bi-check-circle"></i> Enregistrer</button><a href="{% url 'ecritures' %}" class="btn btn-outline-secondary">Annuler</a></form>{% endif %}
+</div></div></div></main></div>
+{% endblock %}

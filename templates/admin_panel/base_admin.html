@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Admin - ComptaAuto{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<style>
+.admin-sidebar { width: 260px; background: #1a3e3a; color: white; min-height: 100vh; padding: 20px; position: fixed; left: 0; top: 0; overflow-y: auto; }
+.admin-sidebar .brand-title { color: white; }
+.admin-sidebar .nav-item { color: rgba(255,255,255,0.8); padding: 8px 12px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 10px; margin-bottom: 2px; font-size: 0.9rem; }
+.admin-sidebar .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+.admin-sidebar .nav-item.active { background: #14706b; color: white; }
+.admin-sidebar .sidebar-section { font-size: 0.7rem; color: rgba(255,255,255,0.5); letter-spacing: 1.5px; margin: 15px 0 8px; }
+.admin-main { margin-left: 260px; padding: 0; min-height: 100vh; background: #f5f7f7; }
+.admin-topbar { background: white; padding: 15px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.admin-content { padding: 30px; }
+.metric-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #14706b; }
+.metric-value { font-size: 2rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+.metric-label { color: #6b8884; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<aside class="admin-sidebar">
+<div class="logo-wrapper mb-4">
+<div class="logo-icon" style="background:#f4b860;">C</div>
+<div><h1 class="brand-title" style="color:white;font-size:1.3rem;">ComptaAuto</h1><p class="brand-subtitle" style="color:rgba(255,255,255,0.6);font-size:0.65rem;">CONSOLE ADMIN</p></div>
+</div>
+
+<div class="sidebar-section">PILOTAGE</div>
+<nav>
+<a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+<a href="{% url 'admin_finances' %}" class="nav-item {% if 'finances' in request.path %}active{% endif %}"><i class="bi bi-currency-exchange"></i> Finances</a>
+<a href="{% url 'admin_stats_avancees' %}" class="nav-item {% if 'stats-avancees' in request.path %}active{% endif %}"><i class="bi bi-graph-up-arrow"></i> Stats avancees</a>
+</nav>
+
+<div class="sidebar-section">GESTION</div>
+<nav>
+<a href="{% url 'admin_entreprises_list' %}" class="nav-item {% if 'entreprise' in request.path %}active{% endif %}"><i class="bi bi-building"></i> Entreprises</a>
+<a href="{% url 'admin_users_list' %}" class="nav-item {% if 'users' in request.path %}active{% endif %}"><i class="bi bi-people"></i> Utilisateurs</a>
+<a href="{% url 'admin_tags_list' %}" class="nav-item {% if 'tags' in request.path %}active{% endif %}"><i class="bi bi-tags"></i> Tags</a>
+</nav>
+
+<div class="sidebar-section">FACTURATION</div>
+<nav>
+<a href="{% url 'admin_paiements' %}" class="nav-item {% if 'paiements' in request.path %}active{% endif %}"><i class="bi bi-credit-card"></i> Paiements</a>
+<a href="{% url 'admin_abonnements' %}" class="nav-item"><i class="bi bi-star"></i> Abonnements</a>
+<a href="{% url 'admin_gestion_forfaits' %}" class="nav-item {% if 'forfaits' in request.path %}active{% endif %}"><i class="bi bi-box"></i> Forfaits</a>
+<a href="{% url 'admin_coupons_list' %}" class="nav-item {% if 'coupons' in request.path %}active{% endif %}"><i class="bi bi-ticket"></i> Coupons promo</a>
+</nav>
+
+<div class="sidebar-section">COMMUNICATION</div>
+<nav>
+<a href="{% url 'tickets_list' %}" class="nav-item"><i class="bi bi-ticket-perforated"></i> Tickets</a>
+<a href="{% url 'messagerie' %}" class="nav-item"><i class="bi bi-chat-dots"></i> Messages</a>
+<a href="{% url 'rappels_list' %}" class="nav-item"><i class="bi bi-telephone"></i> Rappels</a>
+<a href="{% url 'annonces_list' %}" class="nav-item"><i class="bi bi-megaphone"></i> Annonces</a>
+<a href="{% url 'admin_campagnes_list' %}" class="nav-item {% if 'campagnes' in request.path %}active{% endif %}"><i class="bi bi-envelope-paper"></i> Campagnes email</a>
+</nav>
+
+<div class="sidebar-section">SYSTEME</div>
+<nav>
+<a href="{% url 'admin_config_plateforme' %}" class="nav-item {% if 'config' in request.path %}active{% endif %}"><i class="bi bi-sliders"></i> Configuration</a>
+<a href="{% url 'admin_rapports_list' %}" class="nav-item {% if 'rapports' in request.path %}active{% endif %}"><i class="bi bi-file-earmark-pdf"></i> Rapports mensuels</a>
+<a href="{% url 'admin_backups_list' %}" class="nav-item {% if 'backups' in request.path %}active{% endif %}"><i class="bi bi-cloud-arrow-down"></i> Backups</a>
+<a href="{% url 'admin_logs_list' %}" class="nav-item {% if 'logs' in request.path %}active{% endif %}"><i class="bi bi-list-check"></i> Logs audit</a>
+<a href="/django-admin/" class="nav-item" target="_blank"><i class="bi bi-gear"></i> Django Admin</a>
+</nav>
+</aside>
+
+<main class="admin-main">
+<header class="admin-topbar">
+<div>
+<h4 style="margin:0;font-family:'Playfair Display',serif;">{% block page_title %}Dashboard{% endblock %}</h4>
+<small class="text-muted">{% block page_subtitle %}{% endblock %}</small>
+</div>
+<div class="d-flex align-items-center gap-3">
+{% if request.session.admin_original_id %}
+<a href="{% url 'admin_stop_impersonate' %}" class="btn btn-warning btn-sm"><i class="bi bi-arrow-left"></i> Revenir admin</a>
+{% endif %}
+<a href="{% url 'notifications_list' %}" style="color:#14706b;text-decoration:none;font-size:1.3rem;"><i class="bi bi-bell-fill"></i></a>
+<div class="user-info"><div class="user-avatar" style="background:#1a3e3a;">{{ user.first_name.0|default:user.email.0|upper }}</div><div><strong>{{ user.get_full_name|default:user.email }}</strong><small>Super Admin</small></div></div>
+<a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Deconnexion</a>
+</div>
+</header>
+
+<div class="admin-content">
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }} alert-dismissible fade show">{{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endif %}
+{% block content %}{% endblock %}
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

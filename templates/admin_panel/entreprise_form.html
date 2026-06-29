@@ -1,0 +1,17 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Modifier {{ entreprise.nom }}{% endblock %}{% block content %}
+<div class="card"><div class="card-body">
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-md-6 mb-3"><label>Nom</label><input type="text" name="nom" class="form-control" value="{{ entreprise.nom }}" required></div>
+<div class="col-md-6 mb-3"><label>Secteur</label><input type="text" name="secteur" class="form-control" value="{{ entreprise.secteur }}"></div>
+<div class="col-md-6 mb-3"><label>Email contact</label><input type="email" name="email_contact" class="form-control" value="{{ entreprise.email_contact }}"></div>
+<div class="col-md-6 mb-3"><label>Telephone</label><input type="text" name="telephone" class="form-control" value="{{ entreprise.telephone }}"></div>
+<div class="col-12 mb-3"><label>Adresse</label><textarea name="adresse" class="form-control" rows="2">{{ entreprise.adresse }}</textarea></div>
+<div class="col-md-6 mb-3"><label>Formule</label><select name="formule" class="form-select"><option value="STARTER" {% if entreprise.formule == 'STARTER' %}selected{% endif %}>Starter</option><option value="BUSINESS" {% if entreprise.formule == 'BUSINESS' %}selected{% endif %}>Business</option><option value="ENTERPRISE" {% if entreprise.formule == 'ENTERPRISE' %}selected{% endif %}>Enterprise</option></select></div>
+<div class="col-md-6 mb-3"><label>Statut</label><select name="statut" class="form-select"><option value="ACTIF" {% if entreprise.statut == 'ACTIF' %}selected{% endif %}>Actif</option><option value="SUSPENDU" {% if entreprise.statut == 'SUSPENDU' %}selected{% endif %}>Suspendu</option></select></div>
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Enregistrer</button>
+<a href="{% url 'admin_entreprise_detail' entreprise.pk %}" class="btn btn-secondary">Annuler</a>
+</form>
+</div></div>
+{% endblock %}

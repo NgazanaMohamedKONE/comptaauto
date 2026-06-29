@@ -1,0 +1,15 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Nouvelle campagne email{% endblock %}{% block content %}
+<div class="card"><div class="card-body">
+<form method="POST">{% csrf_token %}
+<div class="mb-3"><label>Nom de la campagne (interne)</label><input type="text" name="nom" class="form-control" required></div>
+<div class="mb-3"><label>Sujet</label><input type="text" name="sujet" class="form-control" required></div>
+<div class="mb-3"><label>Contenu du message</label><textarea name="contenu" class="form-control" rows="8" required></textarea></div>
+<div class="mb-3">
+<label><input type="checkbox" name="cible_toutes" checked> Cibler toutes les entreprises</label><br>
+<label><input type="checkbox" name="cible_actives" checked> Uniquement entreprises actives (avec abonnement)</label>
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Creer (brouillon)</button>
+<a href="{% url 'admin_campagnes_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+</div></div>
+{% endblock %}

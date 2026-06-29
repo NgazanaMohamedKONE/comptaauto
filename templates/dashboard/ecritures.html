@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area"><div class="d-flex justify-content-between mb-4"><h3 style="font-family:'Playfair Display',serif;">Ecritures comptables</h3><a href="{% url 'nouvelle_ecriture' %}" class="btn btn-connect"><i class="bi bi-plus"></i> Nouvelle</a></div>
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+<div class="card"><div class="card-body"><table class="table"><thead><tr><th>Date</th><th>Piece</th><th>Libelle</th><th>Debit</th><th>Credit</th><th>Montant</th><th>Statut</th></tr></thead><tbody>
+{% for e in ecritures %}<tr><td>{{ e.date_ecriture }}</td><td>{{ e.numero_piece|default:"-" }}</td><td>{{ e.libelle }}</td><td>{{ e.compte_debit.numero }}</td><td>{{ e.compte_credit.numero }}</td><td>{{ e.montant }} F</td><td><span class="badge bg-success">{{ e.get_statut_display }}</span></td></tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucune ecriture. {% if not comptes %}<a href="{% url 'init_plan' %}">Initialisez le plan comptable</a>.{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></div></div></main></div>
+{% endblock %}

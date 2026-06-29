@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}Inscription{% endblock %}{% block content %}
+<div class="container py-5"><div class="row justify-content-center"><div class="col-md-7"><div class="card shadow"><div class="card-body p-5">
+<h2 class="text-center mb-4" style="font-family:'Playfair Display',serif;">Creer un compte entreprise</h2>
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+<form method="POST">{% csrf_token %}
+<div class="row"><div class="col-md-6 mb-3"><label>Nom entreprise</label><input type="text" name="nom_entreprise" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Secteur</label><input type="text" name="secteur" class="form-control" placeholder="BTP, Commerce..." required></div>
+<div class="col-md-6 mb-3"><label>Prenom</label><input type="text" name="first_name" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Nom</label><input type="text" name="last_name" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Username</label><input type="text" name="username" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Telephone</label><input type="text" name="telephone" class="form-control"></div>
+<div class="col-12 mb-3"><label>Email</label><input type="email" name="email" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Mot de passe</label><input type="password" name="password" class="form-control" required minlength="8"></div>
+<div class="col-md-6 mb-3"><label>Confirmer</label><input type="password" name="password_confirm" class="form-control" required></div></div>
+<button type="submit" class="btn btn-connect btn-lg w-100">Creer mon compte</button>
+<p class="text-center mt-3">Deja inscrit ? <a href="{% url 'login' %}" class="link-primary">Se connecter</a></p>
+</form></div></div></div></div></div>
+{% endblock %}

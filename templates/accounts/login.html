@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Connexion - ComptaAuto{% endblock %}
+{% block content %}
+<div class="login-container">
+<div class="login-left">
+<div class="login-left-content">
+<div class="logo-wrapper"><div class="logo-icon">C</div><div><h1 class="brand-title">ComptaAuto</h1><p class="brand-subtitle">COMPTABILITE AUTOMATISEE</p></div></div>
+<div class="login-welcome"><h2>Bon retour !</h2><p>Connectez-vous pour acceder a votre tableau de bord : tresorerie, saisie automatique, rapprochement et etats financiers en temps reel.</p>
+<ul class="features-list"><li><i class="bi bi-check-circle-fill"></i> OCR + Machine Learning</li><li><i class="bi bi-check-circle-fill"></i> Conformite SYSCOHADA native</li><li><i class="bi bi-check-circle-fill"></i> Support local a Abidjan</li></ul></div>
+<div class="login-footer"><small>CERCO - ENI Cote d'Ivoire - Licence Professionnelle 2025-2026</small></div>
+</div></div>
+<div class="login-right"><div class="login-form-wrapper">
+<span class="form-label-top">ACCES A VOTRE ESPACE</span><h2 class="form-title">Connexion</h2><p class="form-subtitle">Entrez vos identifiants pour continuer.</p>
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }} alert-dismissible fade show">{{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endif %}
+<form method="POST">{% csrf_token %}
+<div class="mb-3"><label class="form-label">Adresse e-mail</label><input type="email" name="email" class="form-control form-control-lg" placeholder="vous@entreprise.ci" required></div>
+<div class="mb-4"><label class="form-label">Mot de passe</label><input type="password" name="password" class="form-control form-control-lg" placeholder="********" required></div>
+<button type="submit" class="btn btn-connect btn-lg w-100">Se connecter</button>
+</form>
+<p class="text-center mt-4">Nouvelle entreprise ? <a href="{% url 'register' %}" class="link-primary">Creer un compte</a></p>
+<div class="alert alert-warning mt-4"><i class="bi bi-lightbulb"></i> Premier test : <a href="{% url 'load_demo' %}"><strong>charger des donnees de demonstration</strong></a></div>
+</div></div></div>
+{% endblock %}

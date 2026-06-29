@@ -1,0 +1,34 @@
+{% extends 'base.html' %}{% block page_title %}{{ conv.sujet }}{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'messagerie' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour aux conversations</a>
+
+<div class="card mt-3"><div class="card-body">
+<h4>{{ conv.sujet }}</h4>
+<p class="text-muted">{{ conv.entreprise.nom }} - Demarree {{ conv.created_at|date:"d/m/Y H:i" }}</p>
+
+<div style="max-height:500px;overflow-y:auto;background:#f8f9fa;padding:20px;border-radius:8px;">
+{% for msg in conv.messages.all %}
+<div class="d-flex {% if msg.expediteur == user %}justify-content-end{% endif %} mb-3">
+<div style="max-width:70%;">
+<div class="p-3 rounded" style="background:{% if msg.expediteur == user %}#14706b;color:white;{% else %}white;border:1px solid #eee;{% endif %}">
+{{ msg.contenu|linebreaks }}
+{% if msg.piece_jointe %}<a href="{{ msg.piece_jointe.url }}" target="_blank" class="d-block mt-2 {% if msg.expediteur == user %}text-white{% endif %}"><i class="bi bi-paperclip"></i> Piece jointe</a>{% endif %}
+</div>
+<small class="text-muted">{{ msg.expediteur.get_full_name|default:msg.expediteur.email }} - {{ msg.created_at|date:"d/m H:i" }}</small>
+</div>
+</div>
+{% endfor %}
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="mt-4">{% csrf_token %}
+<div class="mb-3"><textarea name="contenu" class="form-control" rows="3" placeholder="Tapez votre message..." required></textarea></div>
+<div class="d-flex gap-2">
+<input type="file" name="piece_jointe" class="form-control" style="max-width:300px;">
+<button type="submit" class="btn btn-connect"><i class="bi bi-send"></i> Envoyer</button>
+</div>
+</form>
+</div></div>
+
+</div></main></div>
+{% endblock %}

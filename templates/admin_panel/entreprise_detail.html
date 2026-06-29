@@ -1,0 +1,86 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}{{ entreprise.nom }}{% endblock %}{% block content %}
+<a href="{% url 'admin_entreprises_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+
+<div class="row g-3 mb-3">
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">REVENUS GENERES</div><div class="metric-value text-success">{{ revenus_entreprise|floatformat:0 }} F</div></div></div>
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">ECRITURES</div><div class="metric-value">{{ nb_ecritures }}</div></div></div>
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">FACTURES OCR</div><div class="metric-value">{{ nb_ocr }}</div></div></div>
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">TICKETS</div><div class="metric-value">{{ tickets|length }}</div></div></div>
+</div>
+
+<div class="row g-3">
+<div class="col-md-4">
+<div class="card mb-3"><div class="card-body">
+<h5><i class="bi bi-building"></i> Informations</h5>
+<p><strong>Secteur :</strong> {{ entreprise.secteur }}</p>
+<p><strong>Email :</strong> {{ entreprise.email_contact }}</p>
+<p><strong>Telephone :</strong> {{ entreprise.telephone|default:"-" }}</p>
+<p><strong>Adresse :</strong> {{ entreprise.adresse|default:"-" }}</p>
+<p><strong>Formule :</strong> {{ entreprise.get_formule_display }}</p>
+<p><strong>Statut :</strong> <span class="badge bg-{% if entreprise.statut == 'ACTIF' %}success{% else %}danger{% endif %}">{{ entreprise.get_statut_display }}</span></p>
+<a href="{% url 'admin_entreprise_edit' entreprise.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Modifier</a>
+</div></div>
+
+<div class="card mb-3"><div class="card-body">
+<h5><i class="bi bi-tags"></i> Tags</h5>
+{% for t in tags %}<span class="badge me-1 mb-1" style="background:{{ t.tag.couleur }};">{{ t.tag.nom }} <a href="javascript:retirerTag({{ t.pk }})" style="color:white;text-decoration:none;">x</a></span>{% empty %}<p class="text-muted small">Aucun tag</p>{% endfor %}
+{% if tags_disponibles %}
+<form method="POST" action="{% url 'admin_ajouter_tag_entreprise' entreprise.pk %}" class="mt-2">{% csrf_token %}
+<div class="input-group input-group-sm">
+<select name="tag_id" class="form-select form-select-sm"><option value="">Ajouter un tag...</option>{% for t in tags_disponibles %}<option value="{{ t.pk }}">{{ t.nom }}</option>{% endfor %}</select>
+<button class="btn btn-sm btn-primary">+</button>
+</div>
+</form>
+{% endif %}
+</div></div>
+
+<div class="card"><div class="card-body">
+<h5><i class="bi bi-sticky"></i> Notes internes</h5>
+<form method="POST" action="{% url 'admin_ajouter_note' entreprise.pk %}" class="mb-3">{% csrf_token %}
+<textarea name="contenu" class="form-control mb-2" rows="2" placeholder="Ajouter une note..." required></textarea>
+<label><input type="checkbox" name="importante"> Importante</label>
+<button class="btn btn-sm btn-primary float-end"><i class="bi bi-plus"></i> Ajouter</button>
+</form>
+{% for n in notes %}
+<div class="border-bottom py-2 {% if n.importante %}bg-warning bg-opacity-10 p-2 rounded{% endif %}">
+{% if n.importante %}<span class="badge bg-warning text-dark">Important</span>{% endif %}
+<small class="text-muted">{{ n.created_at|date:"d/m H:i" }} - {{ n.auteur.email }}</small>
+<a href="{% url 'admin_supprimer_note' n.pk %}" class="float-end text-danger" onclick="return confirm('Supprimer ?')"><i class="bi bi-x"></i></a>
+<p>{{ n.contenu }}</p>
+</div>
+{% empty %}<p class="text-muted small">Aucune note</p>{% endfor %}
+</div></div>
+</div>
+
+<div class="col-md-8">
+{% if abonnement_actuel %}
+<div class="card mb-3" style="border-top: 4px solid {{ abonnement_actuel.forfait.couleur }};"><div class="card-body">
+<h5><i class="bi bi-star"></i> Abonnement actuel</h5>
+<div class="row">
+<div class="col-md-6"><p><strong>Forfait :</strong> {{ abonnement_actuel.forfait.nom }}</p><p><strong>Debut :</strong> {{ abonnement_actuel.date_debut|date:"d/m/Y" }}</p></div>
+<div class="col-md-6"><p><strong>Fin :</strong> {{ abonnement_actuel.date_fin|date:"d/m/Y" }}</p><p><strong>Restant :</strong> <span class="badge bg-success">{{ abonnement_actuel.jours_restants }} jours</span></p></div>
+</div>
+</div></div>
+{% endif %}
+
+<div class="card mb-3"><div class="card-body">
+<h5><i class="bi bi-credit-card"></i> Historique paiements</h5>
+<table class="table table-sm">
+<thead><tr><th>Ref</th><th>Forfait</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+<tbody>
+{% for p in paiements %}<tr><td>{{ p.reference }}</td><td>{{ p.forfait.nom }}</td><td>{{ p.montant|floatformat:0 }} F</td><td><span class="badge bg-{% if p.statut == 'VALIDE' %}success{% else %}warning{% endif %}">{{ p.get_statut_display }}</span></td><td>{{ p.created_at|date:"d/m/Y" }}</td></tr>{% empty %}<tr><td colspan="5" class="text-muted">Aucun</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+
+<div class="card"><div class="card-body">
+<h5><i class="bi bi-ticket-perforated"></i> Tickets recents</h5>
+{% for t in tickets %}<div class="border-bottom py-2"><a href="{% url 'ticket_detail' t.pk %}">{{ t.numero }} - {{ t.sujet }}</a> <span class="badge bg-{% if t.statut == 'RESOLU' %}success{% elif t.statut == 'OUVERT' %}warning{% else %}primary{% endif %}">{{ t.get_statut_display }}</span></div>{% empty %}<p class="text-muted small">Aucun ticket</p>{% endfor %}
+</div></div>
+</div>
+</div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function retirerTag(id){await fetch('/admin-panel/entreprise-tags/'+id+'/delete/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});location.reload();}
+</script>
+{% endblock %}

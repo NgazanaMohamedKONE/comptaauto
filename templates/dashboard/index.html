@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }} alert-dismissible fade show">{{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endif %}
+<div class="row g-4 mb-4">
+<div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-teal-light"><i class="bi bi-cash-stack"></i></div><div class="stat-value">{{ tresorerie|floatformat:0 }}</div><div class="stat-label">Tresorerie (FCFA)</div></div></div>
+<div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-teal-light"><i class="bi bi-person-check"></i></div><div class="stat-value">{{ creances|floatformat:0 }}</div><div class="stat-label">Creances clients</div></div></div>
+<div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-orange-light"><i class="bi bi-file-earmark-text"></i></div><div class="stat-value">{{ dettes|floatformat:0 }}</div><div class="stat-label">Dettes fournisseurs</div></div></div>
+<div class="col-md-3"><div class="stat-card"><div class="stat-icon bg-red-light"><i class="bi bi-bell-fill"></i></div><div class="stat-value">{{ alertes_actives }}</div><div class="stat-label">Alertes actives</div></div></div>
+</div>
+<div class="row g-4 mb-4"><div class="col-md-7"><div class="chart-card"><h3>Encaissements 6 derniers mois</h3><canvas id="c1" height="220"></canvas></div></div>
+<div class="col-md-5"><div class="chart-card"><h3>Repartition des charges</h3><canvas id="c2" height="220"></canvas></div></div></div>
+<div class="chart-card"><h3>Activite recente ({{ nb_ecritures }} ecritures)</h3>{% for e in activite_recente %}<div class="activity-item"><span class="dot bg-success"></span><div><strong>{{ e.libelle }}</strong> - {{ e.montant }} FCFA</div><small>{{ e.created_at|timesince }}</small></div>{% empty %}<p class="text-muted">Aucune ecriture. <a href="{% url 'init_plan' %}">Initialisez le plan</a> puis <a href="{% url 'nouvelle_ecriture' %}">creez une ecriture</a>.</p>{% endfor %}</div>
+</div></main></div>
+<script>fetch('/dashboard/api/chart-data/').then(r=>r.json()).then(d=>{
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:d.encaissements.labels,datasets:[{data:d.encaissements.data,backgroundColor:'#14706b'}]},options:{plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:d.charges.labels,datasets:[{data:d.charges.data,backgroundColor:['#0d4f4b','#14706b','#2ecc9b','#f4b860','#a8d8d4','#cce5e3']}]},options:{plugins:{legend:{position:'right'}}}});
+});</script>
+{% endblock %}

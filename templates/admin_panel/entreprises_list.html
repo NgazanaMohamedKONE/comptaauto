@@ -1,0 +1,25 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Entreprises{% endblock %}{% block content %}
+<div class="d-flex justify-content-between mb-3">
+<form method="GET" class="d-flex gap-2"><input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ q }}" style="width:300px;"><select name="statut" class="form-select" style="width:150px;"><option value="">Tous</option><option value="ACTIF" {% if statut_filter == 'ACTIF' %}selected{% endif %}>Actifs</option><option value="SUSPENDU" {% if statut_filter == 'SUSPENDU' %}selected{% endif %}>Suspendus</option></select><button class="btn btn-outline-primary"><i class="bi bi-search"></i></button></form>
+<a href="{% url 'admin_export_entreprises_csv' %}" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</a>
+</div>
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr><th>Entreprise</th><th>Secteur</th><th>Responsable</th><th>Tags</th><th>Formule</th><th>Statut</th><th>Inscription</th><th></th></tr></thead>
+<tbody>
+{% for e in entreprises %}
+<tr>
+<td><strong>{{ e.nom }}</strong><br><small class="text-muted">{{ e.email_contact }}</small></td>
+<td>{{ e.secteur }}</td>
+<td>{{ e.responsable.get_full_name }}</td>
+<td>{% for t in e.tags.all %}<span class="badge me-1" style="background:{{ t.tag.couleur }};">{{ t.tag.nom }}</span>{% endfor %}</td>
+<td><span class="badge bg-light text-dark">{{ e.get_formule_display }}</span></td>
+<td>{% if e.statut == 'ACTIF' %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-danger">{{ e.get_statut_display }}</span>{% endif %}</td>
+<td>{{ e.date_inscription|date:"d/m/Y" }}</td>
+<td><a href="{% url 'admin_entreprise_detail' e.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% endblock %}

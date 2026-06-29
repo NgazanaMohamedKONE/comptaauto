@@ -1,0 +1,49 @@
+<aside class="sidebar">
+<div class="sidebar-brand"><div class="logo-icon">C</div><div><h1 class="brand-title">ComptaAuto</h1><p class="brand-subtitle">COMPTABILITE</p></div></div>
+
+{% if abonnement_actif %}
+<div class="alert alert-{% if abonnement_actif.jours_restants <= 3 %}danger{% elif abonnement_actif.jours_restants <= 7 %}warning{% else %}info{% endif %} py-2 px-3 mb-3" style="font-size:0.85rem;">
+<strong>{{ abonnement_actif.forfait.nom }}</strong><br>
+<small>{{ abonnement_actif.jours_restants }} jours restants</small>
+{% if abonnement_actif.jours_restants <= 7 %}<br><a href="{% url 'tarifs' %}" class="btn btn-sm btn-warning mt-2">Renouveler</a>{% endif %}
+</div>
+{% endif %}
+
+<div class="sidebar-section">PILOTAGE</div>
+<nav class="sidebar-nav"><a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2"></i> Tableau de bord</a></nav>
+
+<div class="sidebar-section">OPERATIONS</div>
+<nav class="sidebar-nav">
+<a href="{% url 'ocr_page' %}" class="nav-item {% if 'ocr' in request.path %}active{% endif %}"><i class="bi bi-text-paragraph"></i> Saisie OCR</a>
+<a href="{% url 'rapprochement_page' %}" class="nav-item {% if 'rapprochement' in request.path %}active{% endif %}"><i class="bi bi-arrow-left-right"></i> Rapprochement</a>
+<a href="{% url 'ecritures' %}" class="nav-item {% if 'ecriture' in request.path %}active{% endif %}"><i class="bi bi-journal-text"></i> Ecritures</a>
+<a href="{% url 'nouvelle_ecriture' %}" class="nav-item"><i class="bi bi-plus-circle"></i> Nouvelle ecriture</a>
+</nav>
+
+<div class="sidebar-section">REPORTING & ALERTES</div>
+<nav class="sidebar-nav">
+<a href="{% url 'reporting_index' %}" class="nav-item {% if 'reporting' in request.path %}active{% endif %}"><i class="bi bi-bar-chart-line"></i> Reporting financier</a>
+<a href="{% url 'alertes_page' %}" class="nav-item {% if 'alerte' in request.path %}active{% endif %}"><i class="bi bi-bell"></i> Alertes</a>
+</nav>
+
+<div class="sidebar-section">SUPPORT</div>
+<nav class="sidebar-nav">
+<a href="{% url 'messagerie' %}" class="nav-item {% if 'conversation' in request.path or 'messagerie' in request.path %}active{% endif %}"><i class="bi bi-chat-dots"></i> Messagerie</a>
+<a href="{% url 'tickets_list' %}" class="nav-item {% if 'ticket' in request.path %}active{% endif %}"><i class="bi bi-ticket-perforated"></i> Tickets support</a>
+<a href="{% url 'annonces_list' %}" class="nav-item {% if 'annonce' in request.path %}active{% endif %}"><i class="bi bi-megaphone"></i> Annonces</a>
+<a href="{% url 'rappels_list' %}" class="nav-item {% if 'rappel' in request.path %}active{% endif %}"><i class="bi bi-telephone"></i> Demandes rappel</a>
+</nav>
+
+<div class="sidebar-section">ABONNEMENT</div>
+<nav class="sidebar-nav">
+<a href="{% url 'mon_abonnement' %}" class="nav-item {% if 'mon-abonnement' in request.path %}active{% endif %}"><i class="bi bi-credit-card"></i> Mon abonnement</a>
+<a href="{% url 'tarifs' %}" class="nav-item {% if 'tarifs' in request.path %}active{% endif %}"><i class="bi bi-tags"></i> Tarifs</a>
+</nav>
+
+<div class="sidebar-section">CONFIGURATION</div>
+<nav class="sidebar-nav">
+<a href="{% url 'init_plan' %}" class="nav-item"><i class="bi bi-list-ol"></i> Initialiser plan</a>
+</nav>
+
+<div class="sidebar-footer"><strong>{{ user.entreprise.nom|default:user.get_full_name }}</strong><small>SYSCOHADA - Exercice {{ user.entreprise.exercice_courant|default:'2026' }}</small></div>
+</aside>

@@ -1,0 +1,28 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Coupons promo{% endblock %}{% block content %}
+<div class="d-flex justify-content-end mb-3"><a href="{% url 'admin_coupon_create' %}" class="btn btn-primary"><i class="bi bi-plus"></i> Nouveau coupon</a></div>
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr><th>Code</th><th>Description</th><th>Reduction</th><th>Periode</th><th>Utilisations</th><th>Statut</th><th>Actions</th></tr></thead>
+<tbody>
+{% for c in coupons %}
+<tr>
+<td><strong style="font-family:monospace;background:#f4b860;color:white;padding:4px 8px;border-radius:4px;">{{ c.code }}</strong></td>
+<td>{{ c.description }}</td>
+<td>{% if c.type_reduction == 'POURCENTAGE' %}-{{ c.valeur|floatformat:0 }}%{% elif c.type_reduction == 'MONTANT' %}-{{ c.valeur|floatformat:0 }} F{% else %}+{{ c.valeur|floatformat:0 }} jours{% endif %}</td>
+<td><small>{{ c.date_debut|date:"d/m/Y" }} - {{ c.date_fin|date:"d/m/Y" }}</small></td>
+<td>{{ c.nb_utilisations }}/{{ c.max_utilisations }}</td>
+<td>{% if c.est_valide %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-secondary">Inactif</span>{% endif %}</td>
+<td>
+<button class="btn btn-sm btn-outline-secondary" onclick="toggle({{ c.pk }})"><i class="bi bi-{% if c.actif %}toggle-on{% else %}toggle-off{% endif %}"></i></button>
+<button class="btn btn-sm btn-outline-danger" onclick="del({{ c.pk }})"><i class="bi bi-trash"></i></button>
+</td>
+</tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucun coupon</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function toggle(id){await fetch('/admin-panel/pack2/coupons/'+id+'/toggle/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});location.reload();}
+async function del(id){if(!confirm('Supprimer ?'))return;await fetch('/admin-panel/pack2/coupons/'+id+'/delete/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});location.reload();}
+</script>
+{% endblock %}

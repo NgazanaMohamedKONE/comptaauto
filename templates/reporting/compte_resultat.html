@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block page_title %}Compte de resultat{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'reporting_index' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="row g-4 mt-3">
+<div class="col-md-6"><div class="card"><div class="card-body">
+<h4 style="color:#c0392b;">CHARGES</h4>
+<table class="table">
+{% for k, v in cr.charges.items %}<tr><td>{{ k }}</td><td class="text-end">{{ v|floatformat:0 }} F</td></tr>{% endfor %}
+<tr style="background:#fde0e0;"><td><strong>TOTAL CHARGES</strong></td><td class="text-end"><strong>{{ cr.total_charges|floatformat:0 }} F</strong></td></tr>
+</table>
+</div></div></div>
+<div class="col-md-6"><div class="card"><div class="card-body">
+<h4 style="color:#14706b;">PRODUITS</h4>
+<table class="table">
+{% for k, v in cr.produits.items %}<tr><td>{{ k }}</td><td class="text-end">{{ v|floatformat:0 }} F</td></tr>{% endfor %}
+<tr style="background:#d4ede9;"><td><strong>TOTAL PRODUITS</strong></td><td class="text-end"><strong>{{ cr.total_produits|floatformat:0 }} F</strong></td></tr>
+</table>
+</div></div></div>
+</div>
+<div class="card mt-4" style="background:{% if cr.resultat >= 0 %}#d4ede9{% else %}#fde0e0{% endif %};"><div class="card-body text-center">
+<h2>RESULTAT NET : <strong>{{ cr.resultat|floatformat:0 }} FCFA</strong></h2>
+<p>{% if cr.resultat >= 0 %}Benefice{% else %}Perte{% endif %}</p>
+</div></div>
+</div></main></div>
+{% endblock %}

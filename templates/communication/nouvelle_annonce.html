@@ -1,0 +1,25 @@
+{% extends 'base.html' %}{% block page_title %}Nouvelle annonce{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'annonces_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<h4>Publier une annonce</h4>
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-md-8 mb-3"><label>Titre</label><input type="text" name="titre" class="form-control" required></div>
+<div class="col-md-4 mb-3"><label>Type</label><select name="type_annonce" class="form-select">
+<option value="INFO">Information</option>
+<option value="MAINTENANCE">Maintenance</option>
+<option value="NOUVEAUTE">Nouveaute</option>
+<option value="IMPORTANT">Important</option>
+</select></div>
+<div class="col-12 mb-3"><label>Contenu</label><textarea name="contenu" class="form-control" rows="6" required></textarea></div>
+<div class="col-md-6 mb-3"><label>Date debut (optionnel)</label><input type="date" name="date_debut" class="form-control"></div>
+<div class="col-md-6 mb-3"><label>Date fin (optionnel)</label><input type="date" name="date_fin" class="form-control"></div>
+<div class="col-12 mb-3"><label><input type="checkbox" name="cible_toutes" checked> Diffuser a toutes les entreprises</label></div>
+</div>
+<button type="submit" class="btn btn-connect"><i class="bi bi-megaphone"></i> Publier</button>
+</form>
+</div></div>
+</div></main></div>
+{% endblock %}

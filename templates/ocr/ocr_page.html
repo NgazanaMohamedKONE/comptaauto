@@ -1,0 +1,119 @@
+{% extends 'base.html' %}{% block title %}Saisie OCR{% endblock %}{% block page_title %}Saisie par OCR{% endblock %}{% block page_subtitle %}Extraction & categorisation automatique - Multi-devises{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="row g-4">
+<div class="col-md-5">
+<div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+<i class="bi bi-cloud-upload" style="font-size:3rem;color:#14706b;"></i>
+<p class="mt-2"><strong>+ Importer une facture</strong></p>
+<small class="text-muted">JPG, PNG, PDF</small>
+<input type="file" id="fileInput" hidden accept="image/*,application/pdf">
+</div>
+
+<div class="mt-3 p-3" style="background:#f0f7f6;border-radius:8px;">
+<small><strong>Devises supportees :</strong></small><br>
+<small class="text-muted">FCFA, EUR, USD, GBP, MAD, CAD, CNY, CHF, JPY, NGN, GHS</small>
+</div>
+
+<h5 class="mt-4">Factures recentes</h5>
+<div id="facturesList">
+{% for f in factures %}
+<div class="facture-card" onclick="loadFacture({{ f.id }})">
+<i class="bi bi-file-earmark-text"></i>
+<div class="flex-grow-1">
+<strong>{{ f.nom_original }}</strong><br>
+<small>
+{{ f.fournisseur|default:'En attente' }} -
+{% if f.montant_original and f.devise != 'XOF' %}
+<strong>{{ f.montant_original|floatformat:2 }} {{ f.devise }}</strong>
+<span class="text-muted">({{ f.montant|floatformat:0 }} FCFA)</span>
+{% else %}
+{{ f.montant|default:'0'|floatformat:0 }} FCFA
+{% endif %}
+- <span class="badge bg-{% if f.statut == 'TERMINE' %}success{% elif f.statut == 'ERREUR' %}danger{% else %}warning{% endif %}">{{ f.statut }}</span>
+</small>
+</div>
+</div>
+{% empty %}<p class="text-muted">Aucune facture.</p>{% endfor %}
+</div>
+</div>
+
+<div class="col-md-7"><div class="card"><div class="card-body">
+<h4>Saisie automatique par OCR</h4>
+<p class="text-muted">De la piece scannee a l'ecriture comptable (toutes devises)</p>
+<div id="resultatOCR">
+<div class="text-center text-muted py-5">
+<i class="bi bi-arrow-bar-up" style="font-size:3rem;"></i>
+<p>Importez une facture pour lancer le traitement.</p>
+</div>
+</div>
+</div></div></div>
+</div>
+</div></main></div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+
+fileInput.addEventListener('change', async(e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const fd = new FormData();
+    fd.append('fichier', file);
+    document.getElementById('resultatOCR').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Traitement OCR + detection devise...</p></div>';
+    const r = await fetch('/ocr/upload/', {method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')}, body:fd});
+    const j = await r.json();
+    if(r.ok){
+        setTimeout(()=>loadFacture(j.id),500);
+        setTimeout(()=>location.reload(),3000);
+    } else {
+        document.getElementById('resultatOCR').innerHTML = '<div class="alert alert-danger">'+JSON.stringify(j)+'</div>';
+    }
+});
+
+async function loadFacture(id){
+    const r = await fetch('/ocr/facture/'+id+'/');
+    const f = await r.json();
+    if(f.statut === 'TERMINE'){
+        let montantHtml = '';
+        if(f.devise && f.devise !== 'XOF' && f.montant_original){
+            montantHtml = `
+                <tr><td><strong>Montant original</strong></td><td><span class="badge bg-info fs-6">${f.montant_original} ${f.devise}</span></td></tr>
+                <tr><td><strong>Taux de change</strong></td><td>1 ${f.devise} = ${f.taux_change} FCFA</td></tr>
+                <tr><td><strong>Montant converti</strong></td><td><strong style="color:#14706b;font-size:1.2em;">${parseInt(f.montant).toLocaleString()} FCFA</strong></td></tr>
+            `;
+        } else {
+            montantHtml = `<tr><td><strong>Montant</strong></td><td><strong style="color:#14706b;font-size:1.2em;">${parseInt(f.montant).toLocaleString()} FCFA</strong></td></tr>`;
+        }
+
+        document.getElementById('resultatOCR').innerHTML = `
+            <div class="alert alert-success"><i class="bi bi-check-circle"></i> Extraction OK - Devise detectee : <strong>${f.devise_display || f.devise}</strong></div>
+            <table class="table">
+                <tr><td><strong>Fournisseur</strong></td><td>${f.fournisseur||'-'}</td></tr>
+                ${montantHtml}
+                <tr><td><strong>Date</strong></td><td>${f.date_facture||'-'}</td></tr>
+                <tr><td><strong>Compte suggere</strong></td><td><span class="badge bg-secondary">${f.compte_suggere||'-'}</span> ${f.libelle_suggere||''}</td></tr>
+                <tr><td><strong>Confiance ML</strong></td><td><div class="progress" style="height:25px;"><div class="progress-bar bg-success" style="width:${(f.score_confiance*100).toFixed(0)}%">${(f.score_confiance*100).toFixed(0)}%</div></div></td></tr>
+            </table>
+            <details><summary class="text-muted">Texte brut extrait</summary><pre style="font-size:0.75rem;background:#f8f9fa;padding:10px;max-height:200px;overflow:auto;">${f.texte_brut||''}</pre></details>
+            ${!f.ecriture_creee && f.montant ? `<button class="btn btn-connect w-100 mt-3" onclick="creerEcriture(${f.id})"><i class="bi bi-check2-circle"></i> Valider et creer l'ecriture comptable</button>` : '<div class="alert alert-info mt-3">Ecriture deja creee</div>'}
+        `;
+    } else if(f.statut === 'ERREUR'){
+        document.getElementById('resultatOCR').innerHTML = '<div class="alert alert-danger">Erreur lors du traitement</div>';
+    } else {
+        setTimeout(()=>loadFacture(id), 1500);
+    }
+}
+
+async function creerEcriture(id){
+    const r = await fetch('/ocr/facture/'+id+'/creer-ecriture/', {method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')}});
+    const j = await r.json();
+    if(r.ok){
+        alert('Ecriture creee avec succes !');
+        location.reload();
+    } else {
+        alert('Erreur: '+JSON.stringify(j));
+    }
+}
+</script>
+{% endblock %}

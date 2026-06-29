@@ -1,0 +1,32 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Utilisateurs{% endblock %}{% block content %}
+<div class="d-flex justify-content-between mb-3">
+<form method="GET" class="d-flex gap-2"><input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ q }}" style="width:300px;"><button class="btn btn-outline-primary"><i class="bi bi-search"></i></button></form>
+<a href="{% url 'admin_user_create' %}" class="btn btn-primary"><i class="bi bi-plus"></i> Nouvel utilisateur</a>
+</div>
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr><th>Email</th><th>Nom</th><th>Role</th><th>Inscription</th><th>Derniere connexion</th><th>Statut</th><th>Actions</th></tr></thead>
+<tbody>
+{% for u in users %}
+<tr>
+<td><strong>{{ u.email }}</strong></td>
+<td>{{ u.get_full_name|default:"-" }}</td>
+<td><span class="badge bg-{% if u.role == 'SUPER_ADMIN' %}warning{% else %}primary{% endif %}">{{ u.get_role_display }}</span></td>
+<td>{{ u.date_joined|date:"d/m/Y" }}</td>
+<td>{{ u.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</td>
+<td>{% if u.is_active %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-danger">Bloque</span>{% endif %}</td>
+<td>
+<a href="{% url 'admin_user_detail' u.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+<a href="{% url 'admin_user_edit' u.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+{% if u != user %}<button class="btn btn-sm btn-outline-danger" onclick="supprimer({{ u.pk }})"><i class="bi bi-trash"></i></button>{% endif %}
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function supprimer(id){if(!confirm('Supprimer ?'))return;const r=await fetch('/admin-panel/users/'+id+'/delete/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});if(r.ok)location.reload();}
+</script>
+{% endblock %}

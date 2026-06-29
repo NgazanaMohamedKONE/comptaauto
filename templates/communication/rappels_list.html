@@ -1,0 +1,37 @@
+{% extends 'base.html' %}{% block page_title %}Demandes de rappel{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="d-flex justify-content-between mb-4">
+<h3 style="font-family:'Playfair Display',serif;">Demandes de rappel telephonique</h3>
+{% if not user.is_super_admin %}<a href="{% url 'demander_rappel' %}" class="btn btn-connect"><i class="bi bi-telephone-plus"></i> Demander un rappel</a>{% endif %}
+</div>
+
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr>{% if user.is_super_admin %}<th>Entreprise</th>{% endif %}<th>Sujet</th><th>Telephone</th><th>Date souhaitee</th><th>Creneau</th><th>Statut</th>{% if user.is_super_admin %}<th>Action</th>{% endif %}</tr></thead>
+<tbody>
+{% for r in rappels %}
+<tr>
+{% if user.is_super_admin %}<td>{{ r.entreprise.nom }}</td>{% endif %}
+<td>{{ r.sujet }}</td>
+<td><strong>{{ r.telephone }}</strong></td>
+<td>{{ r.date_souhaitee|date:"d/m/Y" }}</td>
+<td>{{ r.get_creneau_display }}</td>
+<td><span class="badge bg-{% if r.statut == 'EFFECTUE' %}success{% elif r.statut == 'PROGRAMME' %}primary{% elif r.statut == 'EN_ATTENTE' %}warning{% else %}secondary{% endif %}">{{ r.get_statut_display }}</span></td>
+{% if user.is_super_admin and r.statut == 'EN_ATTENTE' %}<td><button class="btn btn-sm btn-success" onclick="effectue({{ r.pk }})">Marquer effectue</button></td>{% else %}{% if user.is_super_admin %}<td>-</td>{% endif %}{% endif %}
+</tr>
+{% empty %}<tr><td colspan="{% if user.is_super_admin %}7{% else %}5{% endif %}" class="text-center text-muted">Aucun rappel</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+
+</div></main></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function effectue(id){
+    const notes = prompt('Notes (optionnel) :');
+    const fd = new FormData(); if(notes) fd.append('notes', notes);
+    const r = await fetch('/communication/rappels/'+id+'/effectue/', {method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')}, body:fd});
+    if(r.ok) location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}{% block content %}
+<div class="admin-layout">
+<header class="admin-header">
+<div class="logo-wrapper"><div class="logo-icon">C</div><div><h1 class="brand-title" style="color:#1a3e3a;">ComptaAuto</h1><p class="brand-subtitle text-muted">CONSOLE ADMIN</p></div></div>
+<div><a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary btn-sm me-2"><i class="bi bi-arrow-left"></i> Dashboard</a><a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Deconnexion</a></div>
+</header>
+<main class="container-fluid py-4">
+
+<h2 style="font-family:'Playfair Display',serif;">Tous les abonnements</h2>
+
+<div class="row g-4 my-3">
+{% for f in stats_forfaits %}
+<div class="col-md-2"><div class="card text-center" style="border-top: 4px solid {{ f.couleur }};">
+<div class="card-body">
+<i class="bi {{ f.icone }}" style="font-size:2rem;color:{{ f.couleur }};"></i>
+<h3>{{ f.nb_abonnes }}</h3>
+<small class="text-muted">{{ f.nom }}</small>
+</div></div></div>
+{% endfor %}
+</div>
+
+<div class="card mt-4"><div class="card-body">
+<table class="table align-middle">
+<thead><tr><th>Entreprise</th><th>Forfait</th><th>Debut</th><th>Fin</th><th>Jours restants</th><th>OCR utilises</th><th>Statut</th></tr></thead>
+<tbody>
+{% for a in abonnements %}
+<tr>
+<td><strong>{{ a.entreprise.nom }}</strong></td>
+<td><span class="badge" style="background:{{ a.forfait.couleur }};">{{ a.forfait.nom }}</span></td>
+<td>{{ a.date_debut|date:"d/m/Y" }}</td>
+<td>{{ a.date_fin|date:"d/m/Y" }}</td>
+<td>{% if a.statut == 'ACTIF' %}<span class="badge bg-{% if a.jours_restants <= 3 %}danger{% elif a.jours_restants <= 7 %}warning{% else %}success{% endif %}">{{ a.jours_restants }} j</span>{% else %}-{% endif %}</td>
+<td>{{ a.factures_ocr_utilisees }}/{{ a.forfait.max_factures_ocr_mois }}</td>
+<td><span class="badge bg-{% if a.statut == 'ACTIF' %}success{% else %}secondary{% endif %}">{{ a.get_statut_display }}</span></td>
+</tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucun abonnement</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+
+</main></div>
+{% endblock %}

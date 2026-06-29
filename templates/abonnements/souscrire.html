@@ -1,0 +1,79 @@
+{% extends 'base.html' %}{% block page_title %}Souscrire - {{ forfait.nom }}{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+
+<a href="{% url 'tarifs' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour aux tarifs</a>
+
+<div class="row g-4 mt-3">
+<div class="col-md-5">
+<div class="card" style="border-top: 5px solid {{ forfait.couleur }};">
+<div class="card-body text-center">
+<i class="bi {{ forfait.icone }}" style="font-size:4rem;color:{{ forfait.couleur }};"></i>
+<h3 class="mt-2" style="color:{{ forfait.couleur }};">{{ forfait.nom }}</h3>
+<h1 class="my-3">{% if forfait.prix == 0 %}<span class="text-success">GRATUIT</span>{% else %}{{ forfait.prix|floatformat:0 }} FCFA{% endif %}</h1>
+<p class="text-muted">{{ forfait.duree_jours }} jours d'acces</p>
+<hr>
+<ul class="list-unstyled text-start small">
+<li>✅ {{ forfait.max_factures_ocr_mois }} factures OCR/mois</li>
+<li>✅ {{ forfait.max_utilisateurs }} utilisateur(s)</li>
+<li>✅ {{ forfait.max_ecritures_mois }} ecritures/mois</li>
+{% if forfait.rapprochement_bancaire %}<li>✅ Rapprochement bancaire</li>{% endif %}
+{% if forfait.reporting_avance %}<li>✅ Reporting avance</li>{% endif %}
+{% if forfait.support_prioritaire %}<li>✅ Support prioritaire</li>{% endif %}
+{% if forfait.export_illimite %}<li>✅ Export illimite</li>{% endif %}
+</ul>
+</div>
+</div>
+</div>
+
+<div class="col-md-7">
+<div class="card"><div class="card-body">
+{% if forfait.code == 'FREEMIUM' %}
+<h4><i class="bi bi-gift"></i> Activation Freemium</h4>
+<p>Cliquez sur le bouton ci-dessous pour activer immediatement votre essai gratuit de 7 jours.</p>
+<form method="POST">{% csrf_token %}
+<input type="hidden" name="methode" value="ESPECES">
+<button type="submit" class="btn btn-success btn-lg w-100"><i class="bi bi-check-circle"></i> Activer l'essai gratuit</button>
+</form>
+{% else %}
+<h4><i class="bi bi-credit-card"></i> Modalites de paiement</h4>
+<p class="text-muted">Choisissez votre methode de paiement</p>
+
+<div class="alert alert-info">
+<strong>Comment payer ?</strong><br>
+<strong>Mobile Money :</strong> Orange Money : +225 0707 12 34 56 - MTN MoMo : +225 0506 78 90 12<br>
+<strong>Virement bancaire :</strong> IBAN CI93 CI00 1234 5678 9012 3456 78<br>
+Une fois le paiement effectue, remplissez ce formulaire et notre equipe validera dans les 24h.
+</div>
+
+<form method="POST">{% csrf_token %}
+<div class="mb-3"><label>Methode de paiement</label>
+<select name="methode" class="form-select" required>
+<option value="MOBILE_MONEY">Mobile Money (Orange/MTN/Moov)</option>
+<option value="CARTE">Carte bancaire</option>
+<option value="VIREMENT">Virement bancaire</option>
+<option value="ESPECES">Especes</option>
+<option value="CHEQUE">Cheque</option>
+</select>
+</div>
+<div class="mb-3"><label>Numero de transaction (optionnel)</label>
+<input type="text" name="numero_transaction" class="form-control" placeholder="Ex: MP240615.1234.A56789">
+<small class="text-muted">Reference du paiement Mobile Money ou autre</small>
+</div>
+<div class="mb-3"><label>Notes (optionnel)</label>
+<textarea name="notes" class="form-control" rows="3" placeholder="Informations complementaires..."></textarea>
+</div>
+
+<div class="alert alert-warning">
+<strong>Montant a payer : {{ forfait.prix|floatformat:0 }} FCFA</strong>
+</div>
+
+<button type="submit" class="btn btn-connect btn-lg w-100"><i class="bi bi-check-circle"></i> Confirmer la souscription</button>
+</form>
+{% endif %}
+</div></div>
+</div>
+</div>
+
+</div></main></div>
+{% endblock %}

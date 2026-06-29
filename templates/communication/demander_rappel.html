@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% block page_title %}Demander un rappel{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'rappels_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<h4>Demander un rappel telephonique</h4>
+<p class="text-muted">Notre equipe vous contactera au creneau choisi.</p>
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-12 mb-3"><label>Sujet du rappel</label><input type="text" name="sujet" class="form-control" placeholder="Ex: Aide pour configuration TVA" required></div>
+<div class="col-md-6 mb-3"><label>Numero de telephone</label><input type="tel" name="telephone" class="form-control" value="{{ user.telephone }}" required></div>
+<div class="col-md-6 mb-3"><label>Date souhaitee</label><input type="date" name="date_souhaitee" class="form-control" required></div>
+<div class="col-12 mb-3"><label>Creneau prefere</label><select name="creneau" class="form-select">
+<option value="MATIN">Matin (8h-12h)</option>
+<option value="APRES_MIDI">Apres-midi (14h-17h)</option>
+<option value="SOIR">Soir (17h-19h)</option>
+</select></div>
+</div>
+<button type="submit" class="btn btn-connect"><i class="bi bi-telephone-plus"></i> Confirmer la demande</button>
+</form>
+</div></div>
+</div></main></div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Rapports mensuels{% endblock %}{% block content %}
+<div class="card mb-3"><div class="card-body">
+<h5>Generer un nouveau rapport</h5>
+<form method="POST" action="{% url 'admin_generer_rapport' %}" class="d-flex gap-2">{% csrf_token %}
+<select name="mois" class="form-select" style="width:150px;">
+<option value="1">Janvier</option><option value="2">Fevrier</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Aout</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Decembre</option>
+</select>
+<input type="number" name="annee" class="form-control" value="2026" min="2024" max="2030" style="width:150px;">
+<button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> Generer le rapport PDF</button>
+</form>
+</div></div>
+
+<div class="card"><div class="card-body">
+<h5>Rapports existants</h5>
+<table class="table">
+<thead><tr><th>Mois</th><th>Revenus</th><th>Nouveaux clients</th><th>Abonnements actifs</th><th>MRR</th><th>Genere le</th><th>PDF</th></tr></thead>
+<tbody>
+{% for r in rapports %}
+<tr>
+<td><strong>{{ r.mois }}/{{ r.annee }}</strong></td>
+<td>{{ r.revenus_total|floatformat:0 }} F</td>
+<td>{{ r.nb_nouveaux_clients }}</td>
+<td>{{ r.nb_abonnements_actifs }}</td>
+<td>{{ r.mrr|floatformat:0 }} F</td>
+<td>{{ r.created_at|date:"d/m/Y H:i" }}</td>
+<td>{% if r.fichier_pdf %}<a href="{{ r.fichier_pdf.url }}" class="btn btn-sm btn-outline-primary" target="_blank"><i class="bi bi-download"></i> Telecharger</a>{% endif %}</td>
+</tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucun rapport</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+{% endblock %}

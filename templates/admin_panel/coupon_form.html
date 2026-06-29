@@ -1,0 +1,18 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Nouveau coupon{% endblock %}{% block content %}
+<div class="card"><div class="card-body">
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-md-4 mb-3"><label>Code (en majuscules)</label><input type="text" name="code" class="form-control" placeholder="Ex: PROMO2026" required style="text-transform:uppercase;"></div>
+<div class="col-md-8 mb-3"><label>Description</label><input type="text" name="description" class="form-control" placeholder="Ex: Promotion lancement" required></div>
+<div class="col-md-4 mb-3"><label>Type de reduction</label><select name="type_reduction" class="form-select"><option value="POURCENTAGE">Pourcentage (%)</option><option value="MONTANT">Montant fixe (FCFA)</option><option value="JOURS_GRATUITS">Jours gratuits</option></select></div>
+<div class="col-md-4 mb-3"><label>Valeur</label><input type="number" name="valeur" class="form-control" step="0.01" required></div>
+<div class="col-md-4 mb-3"><label>Max utilisations</label><input type="number" name="max_utilisations" class="form-control" value="100"></div>
+<div class="col-md-6 mb-3"><label>Date debut</label><input type="date" name="date_debut" class="form-control" required></div>
+<div class="col-md-6 mb-3"><label>Date fin</label><input type="date" name="date_fin" class="form-control" required></div>
+<div class="col-12 mb-3"><label><input type="checkbox" name="actif" checked> Activer immediatement</label></div>
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Creer</button>
+<a href="{% url 'admin_coupons_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+</div></div>
+{% endblock %}

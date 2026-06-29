@@ -1,0 +1,21 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Gestion des forfaits{% endblock %}{% block content %}
+<div class="row g-3">
+{% for f in forfaits %}
+<div class="col-md-4"><div class="card" style="border-top: 4px solid {{ f.couleur }};"><div class="card-body">
+<i class="bi {{ f.icone }}" style="font-size:2.5rem;color:{{ f.couleur }};"></i>
+<h4>{{ f.nom }}</h4>
+{% if f.populaire %}<span class="badge bg-primary">POPULAIRE</span>{% endif %}
+{% if not f.actif %}<span class="badge bg-secondary">DESACTIVE</span>{% endif %}
+<h2 class="mt-3">{{ f.prix|floatformat:0 }} F</h2>
+<p class="text-muted">{{ f.duree_jours }} jours</p>
+<hr>
+<small>
+<i class="bi bi-file-earmark"></i> {{ f.max_factures_ocr_mois }} OCR/mois<br>
+<i class="bi bi-people"></i> {{ f.max_utilisateurs }} utilisateurs<br>
+<i class="bi bi-journal-text"></i> {{ f.max_ecritures_mois }} ecritures/mois<br>
+</small>
+<a href="{% url 'admin_modifier_forfait' f.pk %}" class="btn btn-primary btn-sm mt-3 w-100"><i class="bi bi-pencil"></i> Modifier</a>
+</div></div></div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}{% block page_title %}Nouveau ticket{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'tickets_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<h4>Ouvrir un ticket de support</h4>
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+<div class="row">
+<div class="col-md-6 mb-3"><label>Categorie</label><select name="categorie" class="form-select" required>
+<option value="TECHNIQUE">Probleme technique</option>
+<option value="COMPTABILITE">Question comptable</option>
+<option value="FACTURATION">Facturation / Abonnement</option>
+<option value="FONCTIONNALITE">Demande de fonctionnalite</option>
+<option value="AUTRE">Autre</option>
+</select></div>
+<div class="col-md-6 mb-3"><label>Priorite</label><select name="priorite" class="form-select" required>
+<option value="BASSE">Basse</option>
+<option value="NORMALE" selected>Normale</option>
+<option value="HAUTE">Haute</option>
+<option value="URGENTE">Urgente</option>
+</select></div>
+<div class="col-12 mb-3"><label>Sujet</label><input type="text" name="sujet" class="form-control" required></div>
+<div class="col-12 mb-3"><label>Description detaillee</label><textarea name="description" class="form-control" rows="6" required></textarea></div>
+<div class="col-12 mb-3"><label>Piece jointe (optionnel)</label><input type="file" name="piece_jointe" class="form-control"></div>
+</div>
+<button type="submit" class="btn btn-connect"><i class="bi bi-send"></i> Creer le ticket</button>
+</form>
+</div></div>
+</div></main></div>
+{% endblock %}

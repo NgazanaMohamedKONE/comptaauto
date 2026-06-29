@@ -1,0 +1,48 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}{{ user_obj.email }}{% endblock %}{% block content %}
+<a href="{% url 'admin_users_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="row g-3">
+<div class="col-md-4"><div class="card"><div class="card-body text-center">
+<div class="user-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;background:#14706b;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;">{{ user_obj.first_name.0|default:user_obj.email.0|upper }}</div>
+<h4>{{ user_obj.get_full_name|default:user_obj.email }}</h4>
+<p class="text-muted">{{ user_obj.email }}</p>
+<span class="badge bg-{% if user_obj.role == 'SUPER_ADMIN' %}warning{% else %}primary{% endif %}">{{ user_obj.get_role_display }}</span>
+{% if user_obj.is_active %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-danger">Bloque</span>{% endif %}
+<hr>
+<div class="text-start">
+<p><strong>Telephone :</strong> {{ user_obj.telephone|default:"-" }}</p>
+<p><strong>Inscription :</strong> {{ user_obj.date_joined|date:"d/m/Y H:i" }}</p>
+<p><strong>Derniere connexion :</strong> {{ user_obj.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</p>
+</div>
+<div class="d-grid gap-2 mt-3">
+<a href="{% url 'admin_user_edit' user_obj.pk %}" class="btn btn-primary"><i class="bi bi-pencil"></i> Modifier</a>
+<button class="btn btn-warning" onclick="resetPwd({{ user_obj.pk }})"><i class="bi bi-key"></i> Reset password</button>
+<button class="btn btn-{% if user_obj.is_active %}danger{% else %}success{% endif %}" onclick="toggleActive({{ user_obj.pk }})">{% if user_obj.is_active %}Bloquer{% else %}Debloquer{% endif %}</button>
+{% if not user_obj.is_super_admin %}
+<form method="POST" action="{% url 'admin_user_impersonate' user_obj.pk %}">{% csrf_token %}<input type="hidden" name="raison" value="Debug admin"><button type="submit" class="btn btn-outline-warning" onclick="return confirm('Se connecter comme {{ user_obj.email }} ?')"><i class="bi bi-person-badge"></i> Se connecter comme...</button></form>
+{% endif %}
+</div>
+</div></div></div>
+
+<div class="col-md-8">
+{% if entreprise %}
+<div class="card mb-3"><div class="card-body">
+<h5><i class="bi bi-building"></i> Entreprise associee</h5>
+<p><strong>{{ entreprise.nom }}</strong> - {{ entreprise.secteur }}</p>
+<a href="{% url 'admin_entreprise_detail' entreprise.pk %}" class="btn btn-sm btn-outline-primary">Voir details</a>
+</div></div>
+{% endif %}
+
+<div class="card"><div class="card-body">
+<h5>Activite recente</h5>
+{% for l in logs %}
+<div class="border-bottom py-2"><small class="text-muted">{{ l.created_at|date:"d/m/Y H:i" }}</small> - <span class="badge bg-secondary">{{ l.get_action_display }}</span> {{ l.description }}</div>
+{% empty %}<p class="text-muted">Aucune activite</p>{% endfor %}
+</div></div>
+</div>
+</div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function resetPwd(id){const p=prompt('Nouveau mot de passe :','Temp2026!');if(!p)return;const fd=new FormData();fd.append('password',p);const r=await fetch('/admin-panel/users/'+id+'/reset-password/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')},body:fd});const j=await r.json();if(r.ok)alert('Mot de passe : '+j.password);}
+async function toggleActive(id){const r=await fetch('/admin-panel/users/'+id+'/toggle-active/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});if(r.ok)location.reload();}
+</script>
+{% endblock %}

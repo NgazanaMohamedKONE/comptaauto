@@ -1,0 +1,27 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}{{ campagne.nom }}{% endblock %}{% block content %}
+<a href="{% url 'admin_campagnes_list' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<div class="row">
+<div class="col-md-8">
+<h4>{{ campagne.sujet }}</h4>
+<p class="text-muted">Cree par {{ campagne.cree_par.email }} le {{ campagne.created_at|date:"d/m/Y H:i" }}</p>
+<div class="border p-3 rounded bg-light">{{ campagne.contenu|linebreaks }}</div>
+</div>
+<div class="col-md-4">
+<div class="border p-3 rounded">
+<p><strong>Statut :</strong> <span class="badge bg-{% if campagne.statut == 'ENVOYEE' %}success{% else %}secondary{% endif %}">{{ campagne.get_statut_display }}</span></p>
+<p><strong>Destinataires :</strong> {{ campagne.nb_destinataires }}</p>
+<p><strong>Envoyes :</strong> {{ campagne.nb_envoyes }}</p>
+{% if campagne.date_envoi_effective %}<p><strong>Date envoi :</strong> {{ campagne.date_envoi_effective|date:"d/m/Y H:i" }}</p>{% endif %}
+{% if campagne.statut == 'BROUILLON' %}
+<button class="btn btn-success w-100" onclick="envoyer({{ campagne.pk }})"><i class="bi bi-send"></i> Envoyer maintenant</button>
+{% endif %}
+</div>
+</div>
+</div>
+</div></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function envoyer(id){if(!confirm('Envoyer cette campagne ?'))return;const r=await fetch('/admin-panel/pack2/campagnes/'+id+'/envoyer/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});const j=await r.json();if(r.ok){alert('Envoyee a '+j.nb+' destinataires');location.reload();}else alert('Erreur');}
+</script>
+{% endblock %}

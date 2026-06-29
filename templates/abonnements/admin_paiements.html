@@ -1,0 +1,50 @@
+{% extends 'base.html' %}{% block content %}
+<div class="admin-layout">
+<header class="admin-header">
+<div class="logo-wrapper"><div class="logo-icon">C</div><div><h1 class="brand-title" style="color:#1a3e3a;">ComptaAuto</h1><p class="brand-subtitle text-muted">CONSOLE ADMIN</p></div></div>
+<div><a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary btn-sm me-2"><i class="bi bi-arrow-left"></i> Dashboard</a><a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Deconnexion</a></div>
+</header>
+<main class="container-fluid py-4">
+
+<h2 style="font-family:'Playfair Display',serif;">Gestion des paiements</h2>
+
+<div class="row g-4 my-3">
+<div class="col-md-4"><div class="stat-card"><div class="stat-icon bg-orange-light"><i class="bi bi-hourglass-split"></i></div><div class="stat-value">{{ nb_en_attente }}</div><div class="stat-label">En attente</div></div></div>
+<div class="col-md-4"><div class="stat-card"><div class="stat-icon bg-teal-light"><i class="bi bi-check-circle"></i></div><div class="stat-value">{{ nb_valides }}</div><div class="stat-label">Valides</div></div></div>
+<div class="col-md-4"><div class="stat-card"><div class="stat-icon bg-teal-light"><i class="bi bi-currency-exchange"></i></div><div class="stat-value">{{ total_revenu|floatformat:0 }}</div><div class="stat-label">Revenus totaux (FCFA)</div></div></div>
+</div>
+
+<div class="card mt-4"><div class="card-body">
+<h4>Tous les paiements</h4>
+<table class="table align-middle">
+<thead><tr><th>Reference</th><th>Entreprise</th><th>Forfait</th><th>Montant</th><th>Methode</th><th>Transaction</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+<tbody>
+{% for p in paiements %}
+<tr>
+<td><strong>{{ p.reference }}</strong></td>
+<td>{{ p.entreprise.nom }}<br><small class="text-muted">{{ p.entreprise.email_contact }}</small></td>
+<td><span class="badge bg-light text-dark">{{ p.forfait.nom }}</span></td>
+<td><strong>{{ p.montant|floatformat:0 }} F</strong></td>
+<td>{{ p.get_methode_display }}</td>
+<td><small>{{ p.numero_transaction|default:"-" }}</small></td>
+<td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
+<td><span class="badge bg-{% if p.statut == 'VALIDE' %}success{% elif p.statut == 'EN_ATTENTE' %}warning{% elif p.statut == 'REFUSE' %}danger{% else %}secondary{% endif %}">{{ p.get_statut_display }}</span></td>
+<td>
+{% if p.statut == 'EN_ATTENTE' %}
+<button class="btn btn-sm btn-success" onclick="valider({{ p.pk }})"><i class="bi bi-check"></i></button>
+<button class="btn btn-sm btn-danger" onclick="refuser({{ p.pk }})"><i class="bi bi-x"></i></button>
+{% endif %}
+<a href="{% url 'telecharger_facture' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-pdf"></i></a>
+</td>
+</tr>
+{% empty %}<tr><td colspan="9" class="text-center text-muted">Aucun paiement</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+
+</main></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function valider(id){if(!confirm('Valider ce paiement ?'))return;const r=await fetch('/abonnements/admin/paiements/'+id+'/valider/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});if(r.ok)location.reload();}
+async function refuser(id){if(!confirm('REFUSER ce paiement ?'))return;const r=await fetch('/abonnements/admin/paiements/'+id+'/refuser/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});if(r.ok)location.reload();}
+</script>
+{% endblock %}

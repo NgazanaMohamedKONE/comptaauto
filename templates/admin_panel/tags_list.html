@@ -1,0 +1,26 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Tags{% endblock %}{% block content %}
+<div class="row">
+<div class="col-md-4"><div class="card"><div class="card-body">
+<h5>Nouveau tag</h5>
+<form method="POST">{% csrf_token %}
+<div class="mb-2"><label>Nom</label><input type="text" name="nom" class="form-control" required></div>
+<div class="mb-2"><label>Couleur</label><input type="color" name="couleur" class="form-control" value="#14706b"></div>
+<div class="mb-2"><label>Description</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Creer</button>
+</form>
+</div></div></div>
+<div class="col-md-8"><div class="card"><div class="card-body">
+<h5>Tags existants</h5>
+{% for t in tags %}
+<div class="border-bottom py-2 d-flex justify-content-between align-items-center">
+<div><span class="badge" style="background:{{ t.couleur }};">{{ t.nom }}</span> <small class="text-muted">{{ t.description }}</small></div>
+<button class="btn btn-sm btn-outline-danger" onclick="del({{ t.pk }})"><i class="bi bi-trash"></i></button>
+</div>
+{% empty %}<p class="text-muted">Aucun tag</p>{% endfor %}
+</div></div></div>
+</div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function del(id){if(!confirm('Supprimer ?'))return;await fetch('/admin-panel/tags/'+id+'/delete/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});location.reload();}
+</script>
+{% endblock %}

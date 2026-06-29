@@ -1,0 +1,15 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Logs d'audit{% endblock %}{% block content %}
+<form method="GET" class="d-flex gap-2 mb-3">
+<input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ q }}" style="width:300px;">
+<select name="action" class="form-select" style="width:200px;"><option value="">Toutes actions</option>{% for a in actions %}<option value="{{ a }}" {% if action_filter == a %}selected{% endif %}>{{ a }}</option>{% endfor %}</select>
+<button class="btn btn-primary"><i class="bi bi-search"></i></button>
+</form>
+<div class="card"><div class="card-body">
+<table class="table table-sm">
+<thead><tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Objet</th><th>Description</th><th>IP</th></tr></thead>
+<tbody>
+{% for l in logs %}<tr><td><small>{{ l.created_at|date:"d/m/Y H:i:s" }}</small></td><td>{{ l.user.email|default:"Systeme" }}</td><td><span class="badge bg-secondary">{{ l.get_action_display }}</span></td><td><small>{{ l.objet_type }} {% if l.objet_id %}#{{ l.objet_id }}{% endif %}</small></td><td>{{ l.description }}</td><td><small>{{ l.ip_address|default:"-" }}</small></td></tr>{% empty %}<tr><td colspan="6" class="text-center text-muted">Aucun log</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% endblock %}

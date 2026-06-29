@@ -1,0 +1,28 @@
+{% extends 'base.html' %}{% block page_title %}Tickets de support{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="d-flex justify-content-between mb-4">
+<h3 style="font-family:'Playfair Display',serif;">Tickets de support</h3>
+{% if not user.is_super_admin %}<a href="{% url 'nouveau_ticket' %}" class="btn btn-connect"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>{% endif %}
+</div>
+
+<div class="card"><div class="card-body">
+<table class="table">
+<thead><tr><th>N° Ticket</th>{% if user.is_super_admin %}<th>Entreprise</th>{% endif %}<th>Sujet</th><th>Categorie</th><th>Priorite</th><th>Statut</th><th>Cree le</th></tr></thead>
+<tbody>
+{% for t in tickets %}
+<tr style="cursor:pointer;" onclick="location.href='{% url 'ticket_detail' t.pk %}'">
+<td><strong>{{ t.numero }}</strong></td>
+{% if user.is_super_admin %}<td>{{ t.entreprise.nom }}</td>{% endif %}
+<td>{{ t.sujet }}</td>
+<td><span class="badge bg-secondary">{{ t.get_categorie_display }}</span></td>
+<td><span class="badge bg-{% if t.priorite == 'URGENTE' %}danger{% elif t.priorite == 'HAUTE' %}warning{% elif t.priorite == 'NORMALE' %}info{% else %}secondary{% endif %}">{{ t.get_priorite_display }}</span></td>
+<td><span class="badge bg-{% if t.statut == 'RESOLU' %}success{% elif t.statut == 'EN_COURS' %}primary{% elif t.statut == 'OUVERT' %}warning{% else %}secondary{% endif %}">{{ t.get_statut_display }}</span></td>
+<td>{{ t.created_at|date:"d/m/Y" }}</td>
+</tr>
+{% empty %}<tr><td colspan="7" class="text-center text-muted">Aucun ticket</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+
+</div></main></div>
+{% endblock %}

@@ -1,0 +1,21 @@
+<header class="topbar"><div>
+<h2 class="topbar-title">{% block page_title %}Tableau de bord{% endblock %}</h2>
+<p class="topbar-subtitle">{% block page_subtitle %}Vue financiere en temps reel{% endblock %}</p></div>
+<div class="topbar-actions">
+<a href="{% url 'notifications_list' %}" class="position-relative" style="color:#14706b;text-decoration:none;font-size:1.5rem;">
+<i class="bi bi-bell-fill"></i>
+<span id="notifCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+</a>
+<div class="user-info"><div class="user-avatar">{{ user.first_name.0|default:user.email.0|upper }}</div><div><strong>{{ user.get_full_name|default:user.email }}</strong><small>{{ user.entreprise.nom|default:'' }}</small></div></div>
+<a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Deconnexion</a></div></header>
+<script>
+function updateNotifCount(){
+    fetch('/communication/api/notifications-count/').then(r=>r.json()).then(d=>{
+        const b = document.getElementById('notifCount');
+        if(d.count > 0){ b.textContent = d.count; b.style.display = 'inline-block'; }
+        else { b.style.display = 'none'; }
+    });
+}
+updateNotifCount();
+setInterval(updateNotifCount, 30000);
+</script>

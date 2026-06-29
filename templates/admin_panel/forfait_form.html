@@ -1,0 +1,24 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Modifier {{ forfait.nom }}{% endblock %}{% block content %}
+<a href="{% url 'admin_gestion_forfaits' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-md-6 mb-3"><label>Nom</label><input type="text" name="nom" class="form-control" value="{{ forfait.nom }}" required></div>
+<div class="col-md-3 mb-3"><label>Prix (FCFA)</label><input type="number" name="prix" class="form-control" value="{{ forfait.prix }}" step="100" required></div>
+<div class="col-md-3 mb-3"><label>Duree (jours)</label><input type="number" name="duree_jours" class="form-control" value="{{ forfait.duree_jours }}" required></div>
+<div class="col-12 mb-3"><label>Description</label><textarea name="description" class="form-control" rows="2">{{ forfait.description }}</textarea></div>
+<div class="col-md-4 mb-3"><label>Max factures OCR/mois</label><input type="number" name="max_factures_ocr_mois" class="form-control" value="{{ forfait.max_factures_ocr_mois }}"></div>
+<div class="col-md-4 mb-3"><label>Max utilisateurs</label><input type="number" name="max_utilisateurs" class="form-control" value="{{ forfait.max_utilisateurs }}"></div>
+<div class="col-md-4 mb-3"><label>Max ecritures/mois</label><input type="number" name="max_ecritures_mois" class="form-control" value="{{ forfait.max_ecritures_mois }}"></div>
+<div class="col-md-3 mb-3"><label><input type="checkbox" name="rapprochement_bancaire" {% if forfait.rapprochement_bancaire %}checked{% endif %}> Rapprochement</label></div>
+<div class="col-md-3 mb-3"><label><input type="checkbox" name="reporting_avance" {% if forfait.reporting_avance %}checked{% endif %}> Reporting avance</label></div>
+<div class="col-md-3 mb-3"><label><input type="checkbox" name="support_prioritaire" {% if forfait.support_prioritaire %}checked{% endif %}> Support prio</label></div>
+<div class="col-md-3 mb-3"><label><input type="checkbox" name="export_illimite" {% if forfait.export_illimite %}checked{% endif %}> Export illimite</label></div>
+<div class="col-md-4 mb-3"><label>Couleur</label><input type="color" name="couleur" class="form-control" value="{{ forfait.couleur }}"></div>
+<div class="col-md-4 mb-3"><label><input type="checkbox" name="actif" {% if forfait.actif %}checked{% endif %}> Forfait actif</label></div>
+<div class="col-md-4 mb-3"><label><input type="checkbox" name="populaire" {% if forfait.populaire %}checked{% endif %}> Marquer "Populaire"</label></div>
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Sauvegarder</button>
+</form>
+</div></div>
+{% endblock %}

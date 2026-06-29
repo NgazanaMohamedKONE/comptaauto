@@ -1,0 +1,20 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Configuration plateforme{% endblock %}{% block content %}
+<div class="card"><div class="card-body">
+<h5>Parametres globaux</h5>
+<form method="POST">{% csrf_token %}
+{% for p in parametres %}
+<div class="mb-3">
+<label><strong>{{ p.cle }}</strong> {% if p.description %}<small class="text-muted">- {{ p.description }}</small>{% endif %}</label>
+{% if p.type_valeur == 'BOOLEAN' %}
+<select name="param_{{ p.cle }}" class="form-select"><option value="true" {% if p.valeur == 'true' %}selected{% endif %}>Oui</option><option value="false" {% if p.valeur == 'false' %}selected{% endif %}>Non</option></select>
+{% elif p.type_valeur == 'NUMBER' %}
+<input type="number" name="param_{{ p.cle }}" class="form-control" value="{{ p.valeur }}">
+{% else %}
+<input type="text" name="param_{{ p.cle }}" class="form-control" value="{{ p.valeur }}">
+{% endif %}
+</div>
+{% endfor %}
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Sauvegarder</button>
+</form>
+</div></div>
+{% endblock %}

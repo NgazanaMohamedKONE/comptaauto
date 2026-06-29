@@ -1,0 +1,40 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Statistiques avancees{% endblock %}{% block content %}
+
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">CHURN RATE</div><div class="metric-value text-danger">{{ churn_rate }}%</div><small class="text-muted">{{ expires_mois }} abos expires ce mois</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#1a8b85;"><div class="metric-label">LTV moyen</div><div class="metric-value">{{ ltv|floatformat:0 }} F</div><small class="text-muted">Revenu moyen par client</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#28a745;"><div class="metric-label">RETENTION</div><div class="metric-value text-success">{{ retention_rate }}%</div><small class="text-muted">Clients > 30 jours actifs</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#f4b860;"><div class="metric-label">CONVERSION</div><div class="metric-value">{{ conversion_rate }}%</div><small class="text-muted">Freemium > Payant</small></div></div>
+</div>
+
+<div class="row g-3">
+<div class="col-md-6"><div class="card"><div class="card-body">
+<h5>Top forfaits par revenus</h5>
+<table class="table">
+<thead><tr><th>Forfait</th><th>Ventes</th><th>Revenus</th></tr></thead>
+<tbody>
+{% for f in top_forfaits %}<tr><td><strong style="color:{{ f.forfait.couleur }};">{{ f.forfait.nom }}</strong></td><td>{{ f.nb_ventes }}</td><td><strong>{{ f.revenus|floatformat:0 }} F</strong></td></tr>{% endfor %}
+</tbody></table>
+</div></div></div>
+
+<div class="col-md-6"><div class="card"><div class="card-body">
+<h5>Top 10 utilisateurs OCR</h5>
+<table class="table">
+<thead><tr><th>Entreprise</th><th>Nb OCR</th></tr></thead>
+<tbody>
+{% for e in top_ocr %}<tr><td>{{ e.nom }}</td><td><span class="badge bg-primary">{{ e.nb_ocr }}</span></td></tr>{% endfor %}
+</tbody></table>
+</div></div></div>
+</div>
+
+<div class="card mt-3"><div class="card-body">
+<h5>Definitions</h5>
+<ul>
+<li><strong>Churn Rate</strong> : % de clients qui n'ont pas renouvele ce mois</li>
+<li><strong>LTV (Lifetime Value)</strong> : Revenu moyen genere par client depuis son inscription</li>
+<li><strong>Retention</strong> : % de clients toujours actifs apres 30 jours</li>
+<li><strong>Conversion</strong> : % de Freemium qui sont passes payants</li>
+</ul>
+</div></div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}{% block page_title %}Notifications{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="d-flex justify-content-between mb-4">
+<h3 style="font-family:'Playfair Display',serif;">Notifications</h3>
+<a href="{% url 'marquer_toutes_lues' %}" class="btn btn-outline-secondary"><i class="bi bi-check-all"></i> Tout marquer comme lu</a>
+</div>
+
+<div class="card"><div class="card-body">
+{% for n in notifs %}
+<a href="{% url 'marquer_notif_lue' n.pk %}" class="text-decoration-none">
+<div class="border-bottom py-3 d-flex align-items-center {% if not n.lue %}bg-light{% endif %}" style="padding:15px;border-radius:8px;">
+<div class="me-3"><i class="bi bi-{% if n.type_notif == 'MESSAGE' %}chat-dots{% elif n.type_notif == 'TICKET' %}ticket-perforated{% elif n.type_notif == 'ANNONCE' %}megaphone{% elif n.type_notif == 'RAPPEL' %}telephone{% else %}info-circle{% endif %}" style="font-size:2rem;color:#14706b;"></i></div>
+<div class="flex-grow-1">
+<strong style="color:#1a3e3a;">{{ n.titre }}</strong>
+{% if not n.lue %}<span class="badge bg-danger ms-2">Nouveau</span>{% endif %}
+<br><small class="text-muted">{{ n.message }}</small>
+</div>
+<small class="text-muted">{{ n.created_at|timesince }}</small>
+</div></a>
+{% empty %}<p class="text-muted text-center py-5">Aucune notification</p>{% endfor %}
+</div></div>
+
+</div></main></div>
+{% endblock %}

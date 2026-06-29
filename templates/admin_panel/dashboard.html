@@ -1,0 +1,94 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Dashboard Administrateur{% endblock %}{% block page_subtitle %}Vue d'ensemble de la plateforme{% endblock %}{% block content %}
+
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">REVENUS DU MOIS</div><div class="metric-value text-success">{{ revenus_mois|floatformat:0 }} F</div><small class="text-muted">Total : {{ revenus_total|floatformat:0 }} F</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#1a8b85;"><div class="metric-label">MRR (Revenu Mensuel Recurrent)</div><div class="metric-value">{{ mrr|floatformat:0 }} F</div><small class="text-muted">ARR : {{ arr|floatformat:0 }} F</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#f4b860;"><div class="metric-label">ENTREPRISES</div><div class="metric-value">{{ total_entreprises }}</div><small class="text-success">+{{ nouvelles_entreprises }} ce mois</small></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#9b59b6;"><div class="metric-label">ABONNEMENTS ACTIFS</div><div class="metric-value">{{ abonnements_actifs }}</div><small class="text-muted">/ {{ total_entreprises }} entreprises</small></div></div>
+</div>
+
+{% if paiements_en_attente or tickets_ouverts or rappels_attente or abonnements_expirent_bientot %}
+<div class="row g-3 mb-4">
+{% if paiements_en_attente %}
+<div class="col-md-3"><a href="{% url 'admin_paiements' %}" class="text-decoration-none"><div class="metric-card" style="border-left-color:#ffc107;background:#fff8e1;"><div class="metric-label text-warning"><i class="bi bi-exclamation-triangle"></i> A VALIDER</div><div class="metric-value">{{ paiements_en_attente }}</div><small>Paiement(s) en attente</small></div></a></div>
+{% endif %}
+{% if tickets_ouverts %}
+<div class="col-md-3"><a href="{% url 'tickets_list' %}" class="text-decoration-none"><div class="metric-card" style="border-left-color:#dc3545;background:#fce4e4;"><div class="metric-label text-danger"><i class="bi bi-ticket-perforated"></i> TICKETS</div><div class="metric-value">{{ tickets_ouverts }}</div><small>Ouvert(s) / En cours</small></div></a></div>
+{% endif %}
+{% if rappels_attente %}
+<div class="col-md-3"><a href="{% url 'rappels_list' %}" class="text-decoration-none"><div class="metric-card" style="border-left-color:#0dcaf0;background:#e0f7fa;"><div class="metric-label text-info"><i class="bi bi-telephone"></i> RAPPELS</div><div class="metric-value">{{ rappels_attente }}</div><small>A effectuer</small></div></a></div>
+{% endif %}
+{% if abonnements_expirent_bientot %}
+<div class="col-md-3"><a href="{% url 'admin_finances' %}" class="text-decoration-none"><div class="metric-card" style="border-left-color:#fd7e14;background:#fff3e0;"><div class="metric-label text-warning"><i class="bi bi-hourglass"></i> EXPIRATIONS</div><div class="metric-value">{{ abonnements_expirent_bientot }}</div><small>Sous 7 jours</small></div></a></div>
+{% endif %}
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+<div class="col-md-8"><div class="card"><div class="card-body">
+<h5>Revenus & Nouveaux clients (12 derniers mois)</h5>
+<canvas id="chartRevenus" height="100"></canvas>
+</div></div></div>
+
+<div class="col-md-4"><div class="card"><div class="card-body">
+<h5>Repartition par forfait</h5>
+<canvas id="chartForfaits" height="200"></canvas>
+</div></div></div>
+</div>
+
+<div class="row g-3">
+<div class="col-md-7"><div class="card"><div class="card-body">
+<h5>Top 5 entreprises actives</h5>
+<table class="table">
+<thead><tr><th>Entreprise</th><th>Secteur</th><th>Ecritures</th><th></th></tr></thead>
+<tbody>
+{% for e in top_entreprises %}
+<tr><td><strong>{{ e.nom }}</strong></td><td>{{ e.secteur }}</td><td><span class="badge bg-primary">{{ e.nb_ecr }}</span></td><td><a href="{% url 'admin_entreprise_detail' e.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div></div></div>
+
+<div class="col-md-5"><div class="card"><div class="card-body">
+<h5>Activite recente</h5>
+{% for l in logs_recents %}
+<div class="border-bottom py-2"><small class="text-muted">{{ l.created_at|timesince }}</small><br><strong>{{ l.user.email|default:"Systeme" }}</strong> - {{ l.description|truncatewords:8 }}</div>
+{% empty %}<p class="text-muted">Aucune activite</p>{% endfor %}
+<a href="{% url 'admin_logs_list' %}" class="btn btn-sm btn-link">Voir tous les logs</a>
+</div></div></div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+fetch('{% url "admin_stats_data" %}').then(r=>r.json()).then(d=>{
+    new Chart(document.getElementById('chartRevenus'), {
+        type: 'bar',
+        data: {
+            labels: d.revenus.labels,
+            datasets: [
+                {label: 'Revenus (FCFA)', data: d.revenus.data, backgroundColor: '#14706b', yAxisID: 'y'},
+                {label: 'Nouveaux clients', data: d.clients.data, type: 'line', borderColor: '#f4b860', backgroundColor: '#f4b860', yAxisID: 'y1', tension: 0.3}
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {position: 'left', title: {display: true, text: 'Revenus'}},
+                y1: {position: 'right', title: {display: true, text: 'Clients'}, grid: {drawOnChartArea: false}}
+            }
+        }
+    });
+});
+
+const repData = {{ repartition|safe }};
+new Chart(document.getElementById('chartForfaits'), {
+    type: 'doughnut',
+    data: {
+        labels: repData.map(r => r.nom),
+        datasets: [{data: repData.map(r => r.count), backgroundColor: repData.map(r => r.couleur)}]
+    },
+    options: {plugins: {legend: {position: 'bottom'}}}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Finances{% endblock %}{% block content %}
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="metric-card"><div class="metric-label">AUJOURD'HUI</div><div class="metric-value text-success">{{ revenus.aujourd_hui|floatformat:0 }} F</div></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#1a8b85;"><div class="metric-label">CE MOIS</div><div class="metric-value">{{ revenus.mois|floatformat:0 }} F</div></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#f4b860;"><div class="metric-label">CETTE ANNEE</div><div class="metric-value">{{ revenus.annee|floatformat:0 }} F</div></div></div>
+<div class="col-md-3"><div class="metric-card" style="border-left-color:#9b59b6;"><div class="metric-label">TOTAL</div><div class="metric-value">{{ revenus.total|floatformat:0 }} F</div></div></div>
+</div>
+
+<div class="d-flex justify-content-end mb-3"><a href="{% url 'admin_export_paiements_excel' %}" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Export Excel</a></div>
+
+<div class="row g-3">
+<div class="col-md-7"><div class="card"><div class="card-body">
+<h5>Paiements recents (valides)</h5>
+<table class="table table-sm">
+<thead><tr><th>Ref</th><th>Entreprise</th><th>Forfait</th><th>Montant</th><th>Date</th></tr></thead>
+<tbody>
+{% for p in paiements_recents %}<tr><td>{{ p.reference }}</td><td>{{ p.entreprise.nom }}</td><td>{{ p.forfait.nom }}</td><td><strong>{{ p.montant|floatformat:0 }} F</strong></td><td>{{ p.created_at|date:"d/m/Y" }}</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div></div>
+
+<div class="col-md-5">
+{% if paiements_attente %}
+<div class="card mb-3 border-warning"><div class="card-body">
+<h5 class="text-warning"><i class="bi bi-exclamation-triangle"></i> A valider ({{ paiements_attente|length }})</h5>
+{% for p in paiements_attente %}<div class="border-bottom py-2"><a href="{% url 'admin_paiements' %}">{{ p.reference }}</a> - {{ p.entreprise.nom }} - <strong>{{ p.montant|floatformat:0 }} F</strong></div>{% endfor %}
+</div></div>
+{% endif %}
+
+{% if expirent_bientot %}
+<div class="card border-danger"><div class="card-body">
+<h5 class="text-danger"><i class="bi bi-hourglass"></i> Expirent sous 7 jours</h5>
+{% for a in expirent_bientot %}<div class="border-bottom py-2"><strong>{{ a.entreprise.nom }}</strong> - {{ a.forfait.nom }} <span class="badge bg-warning">{{ a.jours_restants }}j</span></div>{% endfor %}
+</div></div>
+{% endif %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block page_title %}Reporting financier{% endblock %}{% block page_subtitle %}Etats financiers SYSCOHADA{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="row g-4">
+<div class="col-md-4"><div class="card"><div class="card-body text-center">
+<i class="bi bi-file-earmark-bar-graph" style="font-size:3rem;color:#14706b;"></i>
+<h5 class="mt-3">Bilan SYSCOHADA</h5>
+<p class="text-muted">Actif / Passif</p>
+<a href="{% url 'voir_bilan' %}" class="btn btn-connect w-100 mb-2">Voir</a>
+<a href="{% url 'export_bilan_pdf' %}" class="btn btn-outline-primary w-100"><i class="bi bi-file-pdf"></i> Export PDF</a>
+</div></div></div>
+
+<div class="col-md-4"><div class="card"><div class="card-body text-center">
+<i class="bi bi-graph-up-arrow" style="font-size:3rem;color:#14706b;"></i>
+<h5 class="mt-3">Compte de resultat</h5>
+<p class="text-muted">Charges / Produits</p>
+<a href="{% url 'voir_compte_resultat' %}" class="btn btn-connect w-100">Voir</a>
+</div></div></div>
+
+<div class="col-md-4"><div class="card"><div class="card-body text-center">
+<i class="bi bi-journal-bookmark" style="font-size:3rem;color:#14706b;"></i>
+<h5 class="mt-3">Grand Livre</h5>
+<p class="text-muted">Toutes les ecritures</p>
+<a href="{% url 'voir_grand_livre' %}" class="btn btn-connect w-100 mb-2">Voir</a>
+<a href="{% url 'export_grand_livre_excel' %}" class="btn btn-outline-primary w-100"><i class="bi bi-file-excel"></i> Export Excel</a>
+</div></div></div>
+</div>
+</div></main></div>
+{% endblock %}

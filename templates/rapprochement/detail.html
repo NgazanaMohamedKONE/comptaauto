@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block page_title %}{{ releve.banque }} - {{ releve.nom }}{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<a href="{% url 'rapprochement_page' %}" class="btn btn-link"><i class="bi bi-arrow-left"></i> Retour</a>
+<div class="card mt-3"><div class="card-body">
+<h4>{{ releve.nb_operations }} operations - {{ releve.nb_rapprochees }} rapprochees automatiquement</h4>
+<table class="table">
+<thead><tr><th>Date</th><th>Libelle</th><th>Montant</th><th>Sens</th><th>Score</th><th>Statut</th><th>Ecriture associee</th></tr></thead>
+<tbody>
+{% for op in operations %}
+<tr>
+<td>{{ op.date_operation|date:"d/m/Y" }}</td>
+<td>{{ op.libelle }}</td>
+<td>{{ op.montant }} F</td>
+<td><span class="badge bg-{% if op.sens == 'CREDIT' %}success{% else %}danger{% endif %}">{{ op.sens }}</span></td>
+<td>{% if op.score_rapprochement %}<strong>{{ op.score_rapprochement|floatformat:2 }}</strong>{% else %}-{% endif %}</td>
+<td>{% if op.rapprochee %}<span class="badge bg-success">Rapprochee</span>{% elif op.suggeree %}<span class="badge bg-warning">Suggeree</span>{% else %}<span class="badge bg-secondary">Non rapprochee</span>{% endif %}</td>
+<td>{% if op.ecriture_associee %}{{ op.ecriture_associee.libelle }}{% if op.suggeree %}<button class="btn btn-sm btn-success ms-2" onclick="valider({{ op.id }})"><i class="bi bi-check"></i> Valider</button>{% endif %}{% else %}-{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div></div>
+</div></main></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function valider(id){const r=await fetch('/rapprochement/valider/'+id+'/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});if(r.ok)location.reload();}
+</script>
+{% endblock %}

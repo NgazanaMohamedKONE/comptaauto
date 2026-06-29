@@ -1,0 +1,33 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}Backups base de donnees{% endblock %}{% block content %}
+<div class="card mb-3 border-warning"><div class="card-body">
+<h5><i class="bi bi-exclamation-triangle"></i> Important</h5>
+<p>Sauvegardez regulierement votre base de donnees. En cas de probleme, vous pourrez restaurer un backup.</p>
+<form method="POST" action="{% url 'admin_creer_backup' %}">{% csrf_token %}
+<button type="submit" class="btn btn-warning"><i class="bi bi-cloud-arrow-down"></i> Creer un backup maintenant</button>
+</form>
+</div></div>
+
+<div class="card"><div class="card-body">
+<h5>Backups existants</h5>
+<table class="table">
+<thead><tr><th>Nom</th><th>Taille</th><th>Cree par</th><th>Date</th><th>Actions</th></tr></thead>
+<tbody>
+{% for b in backups %}
+<tr>
+<td><strong>{{ b.nom }}</strong></td>
+<td>{{ b.taille_mo }} Mo</td>
+<td>{{ b.created_by.email|default:"-" }}</td>
+<td>{{ b.created_at|date:"d/m/Y H:i" }}</td>
+<td>
+<a href="{% url 'admin_telecharger_backup' b.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+<button class="btn btn-sm btn-outline-danger" onclick="del({{ b.pk }})"><i class="bi bi-trash"></i></button>
+</td>
+</tr>
+{% empty %}<tr><td colspan="5" class="text-center text-muted">Aucun backup</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+<script>
+function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);if(v.length===2)return v.pop().split(';').shift();}
+async function del(id){if(!confirm('Supprimer ce backup ?'))return;await fetch('/admin-panel/pack2/backups/'+id+'/delete/',{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')}});location.reload();}
+</script>
+{% endblock %}

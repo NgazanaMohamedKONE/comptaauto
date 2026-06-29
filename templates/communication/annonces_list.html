@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block page_title %}Annonces{% endblock %}{% block content %}
+<div class="app-layout">{% include 'partials/sidebar.html' %}<main class="main-content">{% include 'partials/topbar.html' %}
+<div class="content-area">
+<div class="d-flex justify-content-between mb-4">
+<h3 style="font-family:'Playfair Display',serif;">Annonces ComptaAuto</h3>
+{% if user.is_super_admin %}<a href="{% url 'nouvelle_annonce' %}" class="btn btn-connect"><i class="bi bi-megaphone"></i> Nouvelle annonce</a>{% endif %}
+</div>
+
+{% for a in annonces %}
+<div class="card mb-3"><div class="card-body">
+<div class="d-flex justify-content-between">
+<h5>
+<span class="badge bg-{% if a.type_annonce == 'IMPORTANT' %}danger{% elif a.type_annonce == 'MAINTENANCE' %}warning{% elif a.type_annonce == 'NOUVEAUTE' %}success{% else %}info{% endif %} me-2">{{ a.get_type_annonce_display }}</span>
+{{ a.titre }}
+</h5>
+<small class="text-muted">{{ a.created_at|date:"d/m/Y H:i" }}</small>
+</div>
+<p>{{ a.contenu|linebreaks }}</p>
+{% if a.date_debut or a.date_fin %}<small class="text-muted">Periode : {{ a.date_debut|default:"-" }} au {{ a.date_fin|default:"-" }}</small>{% endif %}
+</div></div>
+{% empty %}
+<p class="text-muted text-center py-5">Aucune annonce pour le moment.</p>
+{% endfor %}
+
+</div></main></div>
+{% endblock %}

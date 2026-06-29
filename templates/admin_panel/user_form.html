@@ -1,0 +1,18 @@
+{% extends 'admin_panel/base_admin.html' %}{% block page_title %}{% if user_obj %}Modifier{% else %}Nouvel{% endif %} utilisateur{% endblock %}{% block content %}
+<div class="card"><div class="card-body">
+<form method="POST">{% csrf_token %}
+<div class="row">
+<div class="col-md-6 mb-3"><label>Email</label><input type="email" name="email" class="form-control" value="{{ user_obj.email }}" required></div>
+<div class="col-md-6 mb-3"><label>Username</label><input type="text" name="username" class="form-control" value="{{ user_obj.username }}" required></div>
+<div class="col-md-6 mb-3"><label>Prenom</label><input type="text" name="first_name" class="form-control" value="{{ user_obj.first_name }}"></div>
+<div class="col-md-6 mb-3"><label>Nom</label><input type="text" name="last_name" class="form-control" value="{{ user_obj.last_name }}"></div>
+<div class="col-md-6 mb-3"><label>Telephone</label><input type="text" name="telephone" class="form-control" value="{{ user_obj.telephone }}"></div>
+<div class="col-md-6 mb-3"><label>Role</label><select name="role" class="form-select"><option value="ENTREPRISE" {% if user_obj.role == 'ENTREPRISE' %}selected{% endif %}>Entreprise</option><option value="SUPER_ADMIN" {% if user_obj.role == 'SUPER_ADMIN' %}selected{% endif %}>Super Admin</option></select></div>
+{% if not user_obj %}<div class="col-md-6 mb-3"><label>Mot de passe</label><input type="password" name="password" class="form-control" required minlength="8"></div>{% endif %}
+{% if user_obj %}<div class="col-12 mb-3"><label><input type="checkbox" name="is_active" {% if user_obj.is_active %}checked{% endif %}> Compte actif</label></div>{% endif %}
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Enregistrer</button>
+<a href="{% url 'admin_users_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+</div></div>
+{% endblock %}
