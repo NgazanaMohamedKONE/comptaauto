@@ -11,23 +11,15 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY', default='dev-key-change-me-in-prod')
 DEBUG = env('DEBUG', default=False)
 
-# --- CONFIGURATION HÔTES ET SÉCURITÉ (Vercel & Render) ---
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+# --- CONFIGURATION HÔTES ET SÉCURITÉ ---
+# L'étoile (*) élimine définitivement les erreurs 400 Bad Request sur Vercel
+ALLOWED_HOSTS = ['*']
 
-# Support pour Vercel (Production et Previews)
-ALLOWED_HOSTS.append('.vercel.app')
 VERCEL_URL = os.environ.get('VERCEL_URL')
-if VERCEL_URL:
-    ALLOWED_HOSTS.append(VERCEL_URL)
-
-# Support pour Render (Ancienne config conservée)
-ALLOWED_HOSTS.append('.onrender.com')
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
 
 # --- CSRF TRUSTED ORIGINS ---
+# Indispensable pour éviter les erreurs 403 Forbidden sur vos formulaires
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://*.onrender.com',
