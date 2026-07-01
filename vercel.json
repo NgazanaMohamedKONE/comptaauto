@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "comptaauto/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "comptaauto/wsgi.py"
+    }
+  ],
+  "build": {
+    "env": {
+      "PYTHON_VERSION": "3.10"
+    }
+  }
+}
