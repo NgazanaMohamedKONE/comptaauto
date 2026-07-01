@@ -11,26 +11,49 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY', default='dev-key-change-me-in-prod')
 DEBUG = env('DEBUG', default=False)
 
-# Hosts autorises (Render + localhost)
+# --- CONFIGURATION HÔTES ET SÉCURITÉ (Vercel & Render) ---
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
-# Ajouter le hostname Render automatiquement
+
+# Support pour Vercel (Production et Previews)
+ALLOWED_HOSTS.append('.vercel.app')
+VERCEL_URL = os.environ.get('VERCEL_URL')
+if VERCEL_URL:
+    ALLOWED_HOSTS.append(VERCEL_URL)
+
+# Support pour Render (Ancienne config conservée)
+ALLOWED_HOSTS.append('.onrender.com')
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-ALLOWED_HOSTS.append('.onrender.com')
 
-# CSRF trusted origins
+
+# --- CSRF TRUSTED ORIGINS ---
 CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
     'https://*.onrender.com',
 ]
+if VERCEL_URL:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{VERCEL_URL}')
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+# --------------------------------------------------------
 
 INSTALLED_APPS = [
-    'django.contrib.admin','django.contrib.auth','django.contrib.contenttypes',
-    'django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles',
-    'accounts','comptabilite','ocr_app','dashboard',
-    'rapprochement','reporting','alertes','communication','abonnements',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'accounts',
+    'comptabilite',
+    'ocr_app',
+    'dashboard',
+    'rapprochement',
+    'reporting',
+    'alertes',
+    'communication',
+    'abonnements',
     'admin_panel',
 ]
 
@@ -47,6 +70,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'comptaauto.urls'
+
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [BASE_DIR / 'templates'],
@@ -59,6 +83,7 @@ TEMPLATES = [{
         'abonnements.middleware.context_abonnement',
     ]},
 }]
+
 WSGI_APPLICATION = 'comptaauto.wsgi.application'
 
 # Database : PostgreSQL en prod, SQLite en local
