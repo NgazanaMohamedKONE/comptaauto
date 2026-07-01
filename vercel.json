@@ -1,14 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "comptaauto/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxDuration": 25
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
@@ -18,10 +9,5 @@
       "src": "/(.*)",
       "dest": "comptaauto/wsgi.py"
     }
-  ],
-  "functions": {
-    "comptaauto/wsgi.py": {
-      "includeFiles": "staticfiles/**"
-    }
-  }
+  ]
 }
