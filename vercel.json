@@ -3,18 +3,25 @@
   "builds": [
     {
       "src": "comptaauto/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxDuration": 25
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "staticfiles/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "comptaauto/wsgi.py"
     }
   ],
-  "build": {
-    "env": {
-      "PYTHON_VERSION": "3.10"
+  "functions": {
+    "comptaauto/wsgi.py": {
+      "includeFiles": "staticfiles/**"
     }
   }
 }
